@@ -2,6 +2,14 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
+// ---------------------------------------------------------------- //
+// Collaborators | Andrew Ebersole
+// Created Date  | 7-21-23
+// Last Update   | 7-26-23
+// Purpose       | Main class of the program, used to initalize other
+//               | Classes and delegaate tasks to those classes
+// ---------------------------------------------------------------- //
+
 namespace UndeadKnights
 {
     public class Game1 : Game
@@ -9,13 +17,19 @@ namespace UndeadKnights
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
+        // Fields
+        private Rectangle WindowSize;
+        private ContentManager contentManager;
+        private MenuUI menuUI;
+        private Save save;
+        
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
         }
-
+        
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
@@ -42,10 +56,12 @@ namespace UndeadKnights
 
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(Color.Black);
+            _graphics.BeginDraw();
 
-            // TODO: Add your drawing code here
+            
 
+            _graphics.EndDraw();
             base.Draw(gameTime);
         }
     }
