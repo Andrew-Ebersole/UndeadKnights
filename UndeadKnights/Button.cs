@@ -30,11 +30,13 @@ namespace UndeadKnights
         private Rectangle rectangle;
         private string text;
         private SpriteFont font;
+        private Color textColor;
 
         // Mouse Data
         private MouseState currentMS;
         private MouseState previousMS;
         private bool isPressed;
+        private bool isHovered;
 
         // Graphics
         private Texture2D singleColor;
@@ -49,10 +51,14 @@ namespace UndeadKnights
         public bool IsPressed { get { return isPressed; } }
 
         /// <summary>
+        /// Returns true if the mouse overlaps the button
+        /// </summary>
+        public bool IsHovered { get { return isHovered; } }
+
+        /// <summary>
         /// Allows the text to be changed
         /// </summary>
         public string Text { get { return text; } set { text = value; } }
-
 
         // --- Constructor --- //
 
@@ -92,12 +98,16 @@ namespace UndeadKnights
             // Get the current mouse state
             currentMS = Mouse.GetState();
 
-            // Check if this is the first frame left click has been held down
-            if (currentMS.LeftButton == ButtonState.Pressed
-                && previousMS.LeftButton == ButtonState.Released)
+            // Check if the mouse is overlapping the button
+            if (new Rectangle(currentMS.X, currentMS.Y, 0, 0).Intersects(rectangle))
             {
-                // Check if the mouse is overlapping the button
-                if (new Rectangle(currentMS.X, currentMS.Y, 0, 0).Intersects(rectangle))
+
+                // Set is hover to true
+                isHovered = true;
+
+                // Check if this is the first frame left click has been held down
+                if (currentMS.LeftButton == ButtonState.Pressed
+                && previousMS.LeftButton == ButtonState.Released)
                 {
                     // isPressed = true when the button is left clicked
                     isPressed = true;
@@ -107,6 +117,7 @@ namespace UndeadKnights
                 }
             } else
             {
+                isHovered = false;
                 isPressed = false;
             }
 
@@ -124,8 +135,16 @@ namespace UndeadKnights
             // Draw the background
             sb.Draw(singleColor, rectangle, Color.Black * 0.4f);
 
+            if (isHovered)
+            {
+                textColor = Color.Yellow;
+            } else
+            {
+                textColor = Color.White;
+            }
+
             // Draw the text
-            sb.DrawString(font, text, new Vector2(rectangle.X, rectangle.Y), Color.White);
+            sb.DrawString(font, text, new Vector2(rectangle.X, rectangle.Y), textColor);
         }
     }
 }
