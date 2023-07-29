@@ -54,7 +54,12 @@ namespace UndeadKnights
                 Content,
                 new Point(window.Width,window.Height),
                 GraphicsDevice);
-            
+
+            // Initalize the content manager class
+            GameManager.Get.Initialize(
+                Content,
+                new Point(window.Width, window.Height),
+                GraphicsDevice);
 
         }
 
@@ -65,6 +70,7 @@ namespace UndeadKnights
 
             // Update Menu UI
             MenuUI.Get.Update(gameTime);
+            GameManager.Get.Update(gameTime);
 
             // Check if quit button was pressed
             if (MenuUI.Get.Buttons[0][3].IsPressed)
@@ -82,6 +88,7 @@ namespace UndeadKnights
             _spriteBatch.Begin();
 
             // Draw Menu UI
+            GameManager.Get.Draw(_spriteBatch);
             MenuUI.Get.Draw(_spriteBatch);
 
             _spriteBatch.End();

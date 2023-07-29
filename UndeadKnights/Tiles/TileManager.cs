@@ -5,6 +5,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.ComponentModel;
+using Microsoft.Xna.Framework.Content;
+using System.Security.Cryptography;
 
 // ---------------------------------------------------------------- //
 // Collaborators | Andrew Ebersole
@@ -19,19 +22,53 @@ namespace UndeadKnights.Tiles
     {
         // --- Fields --- //
 
+        // Tile Grid
+        private Tile[,] tileGrid;
+        private Texture2D environmentSpriteSheet;
+        private Random rng;
 
+        //Singleton
 
+        public static TileManager instance = null;
 
+        public static TileManager Get
+        {
+            get
+            {
+                if (instance == null)
+                {
+                    instance = new TileManager();
+                }
+
+                return instance;
+            }
+        }
 
         // --- Properties --- //
 
-
+        public Tile[,] TileGrid { get { return tileGrid; } }
 
 
 
         // --- Constructor --- //
 
+        public void Initialize(ContentManager content,
+           Point windowsize, GraphicsDevice gd)
+        {
+            // Create new grid of tiles
+            tileGrid = new Tile[50, 50];
+            environmentSpriteSheet = content.Load<Texture2D>("EnvironmentSpriteSheet");
 
+            rng = new Random();
+            for (int i = 0; i < 50; i++)
+            {
+                for (int j = 0; j < 50; j++)
+                {
+                    tileGrid[i, j] = new Tile(environmentSpriteSheet, 
+                        new Point(rng.Next(0, 2), rng.Next(0, 2)));
+                }
+            }
+        }
 
 
 
@@ -52,7 +89,13 @@ namespace UndeadKnights.Tiles
         /// <param name="sb"></param>
         public void Draw(SpriteBatch sb)
         {
-
+            for (int i = 0; i < 50; i++)
+            {
+                for (int j = 0; j < 50; j++)
+                {
+                    tileGrid[i, j].Draw(sb, new Point(i, j));
+                }
+            }
         }
     }
 }

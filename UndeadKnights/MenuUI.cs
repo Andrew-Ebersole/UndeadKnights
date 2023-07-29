@@ -63,7 +63,7 @@ namespace UndeadKnights
 
         public List<List<Button>> Buttons { get { return buttons; } }
 
-
+        public GameState GameFSM { get { return gameFSM; } }
 
         // --- Constructor --- //
 
@@ -73,7 +73,7 @@ namespace UndeadKnights
         /// <param name="content"></param>
         /// <param name="windowsize"></param>
         /// <param name="gd"></param>
-        public void Initialize(Microsoft.Xna.Framework.Content.ContentManager content,
+        public void Initialize(ContentManager content,
             Point windowsize, GraphicsDevice gd)
         {
             // Fonts
@@ -108,7 +108,11 @@ namespace UndeadKnights
                     {
                         button.Update(gt);
                     }
-                    if (buttons[0][0].IsPressed) { gameFSM = GameState.Game; }
+                    if (buttons[0][0].IsPressed) 
+                    { 
+                        gameFSM = GameState.Game;
+                        GameManager.Get.PlayTime = 0;
+                    }
                     if (buttons[0][1].IsPressed) { gameFSM = GameState.Settings; }
                     if (buttons[0][2].IsPressed) { gameFSM = GameState.Credits; }
 
@@ -286,6 +290,13 @@ namespace UndeadKnights
             buttons[4].Add(new Button(new Rectangle(9 * window.Width / 24, 15 * window.Height / 24,   // X,Y
                 3 * window.Width / 12, 1 * window.Height / 12),                                      // Width,Height
                 "Return to Menu",     // Text
+                gd,         // Graphics Device
+                vinque48)); // Font
+
+            // For testing delete later
+            buttons[3].Add(new Button(new Rectangle(12 * window.Width / 24-5, 12 * window.Height / 24-5,   // X,Y
+                10,10),                                      // Width,Height
+                "",     // Text
                 gd,         // Graphics Device
                 vinque48)); // Font
         }
