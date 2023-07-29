@@ -128,13 +128,23 @@ namespace UndeadKnights.Tiles
         /// </summary>
         public void GeneratePath()
         {
-            for (int i = 25; i < 51; i++)
+            // Right now path is hard coded
+            // down the line will either use file reading or
+            // preferrably procedurally generated paths
+            for (int y = 25; y < 38; y++)
             {
-                tileGrid[25, i] = new Tile(TileType.Path, environmentSpriteSheet);
+                tileGrid[25, y] = new Tile(TileType.Path, environmentSpriteSheet);
+            }
+            for (int x = 25; x < 36; x++)
+            {
+                tileGrid[x, 38] = new Tile(TileType.Path, environmentSpriteSheet);
+            }
+            for (int y = 38; y < 51; y++)
+            {
+                tileGrid[36, y] = new Tile(TileType.Path, environmentSpriteSheet);
             }
             FillGrass(20);
         }
-
         /// <summary>
         /// Replaces grass with other resources
         /// </summary>
@@ -155,11 +165,19 @@ namespace UndeadKnights.Tiles
                             // Determine if its will be a rock or tree
                             if (rng.Next(0, 100) > 20)
                             {
-                                tileGrid[x, y] = new Tile(TileType.Tree, environmentSpriteSheet);
+                                // If the tree is near a path dont spawn (with randomization)
+                                if (rng.Next(2,5) < NearestPath(x, y))
+                                {
+                                    tileGrid[x, y] = new Tile(TileType.Tree, environmentSpriteSheet);
+                                }
                             }
                             else
                             {
-                                tileGrid[x, y] = new Tile(TileType.Rock, environmentSpriteSheet);
+                                // If the rock is near a path dont spawn (with randomization)
+                                if (rng.Next(5,10) < NearestPath(x, y))
+                                {
+                                    tileGrid[x, y] = new Tile(TileType.Rock, environmentSpriteSheet);
+                                }
                             }
                         }
                     }
@@ -168,14 +186,93 @@ namespace UndeadKnights.Tiles
         }
 
 
-        public int NearestPath(int x, int y)
+        /// <summary>
+        /// Return how far away the nearest path is to the given tile
+        /// Returns 11 if it is 11 or more
+        /// </summary>
+        /// <param name="startingX"></param>
+        /// <param name="startingY"></param>
+        /// <returns></returns>
+        public int NearestPath(int startingX, int startingY)
         {
             int distance = 0;
-            for (int i = 0; i < distance; i++)
-            {
 
+            
+            // Keep going until found path or distnace is greater than 11
+            while (distance < 11)
+            {
+                // Starts right and goes clockwise outwards
+                int x = distance;
+                int y = 0;
+
+                if (IsPath(startingX + x, startingY + y))
+                {
+                    return distance;
+                }
+                // Right to down
+                while (y < distance)
+                {
+                    x-=1;
+                    y+=1;
+                    if (IsPath(startingX + x, startingY + y))
+                    {
+                        return distance;
+                    }
+                }
+                // down to left
+                while (x > -distance)
+                {
+                    x-=1;
+                    y-=1;
+                    if (IsPath(startingX + x, startingY + y))
+                    {
+                        return distance;
+                    }
+                }
+                // Left to up
+                while (y > -distance)
+                {
+                    x+=1;
+                    y-=1;
+                    if (IsPath(startingX + x, startingY + y))
+                    {
+                        return distance;
+                    }
+                }
+                // up to right
+                while (x < distance)
+                {
+                    x+=1;
+                    y+=1;
+                    if (IsPath(startingX + x, startingY + y))
+                    {
+                        return distance;
+                    }
+                }
+                // increase distance
+                distance++;
             }
-            return 0;
+            
+            return distance;
+        }
+
+        /// <summary>
+        /// Returns true if entered tile is a path
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
+        public bool IsPath(int x, int y)
+        {
+            if (x >= 0 && y >= 0
+                && x <51 && y < 51)
+            {
+                if (tileGrid[x, y].TileType == TileType.Path)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }
