@@ -20,15 +20,24 @@ namespace UndeadKnights
         // Fields
         private Rectangle window;
         
+
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
+            
         }
-        
+
         protected override void Initialize()
         {
+
+            // Full screen
+            _graphics.PreferredBackBufferWidth = 1920;
+            _graphics.PreferredBackBufferHeight = 1080;
+            _graphics.IsFullScreen = false;
+            _graphics.ApplyChanges();
+            
             // Rectanlge window created to easily use window.Width and window.Height
             window = new Rectangle(0,0,
                 _graphics.PreferredBackBufferWidth,_graphics.PreferredBackBufferHeight);
@@ -56,6 +65,12 @@ namespace UndeadKnights
 
             // Update Menu UI
             MenuUI.Get.Update(gameTime);
+
+            // Check if quit button was pressed
+            if (MenuUI.Get.Buttons[0][3].IsPressed)
+            {
+                Exit();
+            }
 
             base.Update(gameTime);
         }

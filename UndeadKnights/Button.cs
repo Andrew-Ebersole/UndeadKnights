@@ -143,8 +143,8 @@ namespace UndeadKnights
                 textColor = Color.White;
             }
 
-            // Draw the text
-            sb.DrawString(font, text, new Vector2(rectangle.X, rectangle.Y), textColor);
+            // Draw the text with a 10 pixel margin
+            sb.DrawString(font, text, new Vector2(rectangle.X+10, rectangle.Y), textColor);
         }
     }
 }

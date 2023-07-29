@@ -34,12 +34,14 @@ namespace UndeadKnights
         // GameStates
         GameState gameFSM;
         private Texture2D singlecolor;
-        private SpriteFont arial12;
+        private SpriteFont vinque48;
+        private SpriteFont vinque72;
 
         // Buttons
-        private Button testButton;
+        List<List<Button>> buttons;
 
-
+        // Window size
+        private Rectangle window;
 
         // Singleton
         private static MenuUI instance = null;
@@ -59,7 +61,7 @@ namespace UndeadKnights
 
         // --- Properties --- //
 
-
+        public List<List<Button>> Buttons { get { return buttons; } }
 
 
 
@@ -74,11 +76,18 @@ namespace UndeadKnights
         public void Initialize(Microsoft.Xna.Framework.Content.ContentManager content,
             Point windowsize, GraphicsDevice gd)
         {
-            arial12 = content.Load<SpriteFont>("arial-12");
+            // Fonts
+            vinque48 = content.Load<SpriteFont>("vinque-48");
+            vinque72 = content.Load<SpriteFont>("vinque-72");
 
+            // Defualt Game State
             gameFSM = GameState.Menu;
 
-            testButton = new Button(new Rectangle(10,10,100,100),"start game",gd,arial12);
+            // Window size
+            window = new Rectangle(new Point(0,0),windowsize);
+
+            // Enter locations of all buttons
+            CreateButtons(gd);
         }
 
 
@@ -91,11 +100,52 @@ namespace UndeadKnights
         /// <param name="gt"></param>
         public void Update(GameTime gt)
         {
-            testButton.Update(gt);
-
-            if (testButton.IsPressed)
+            // Menu finite state machine
+            switch (gameFSM)
             {
-                gameFSM = GameState.Game;
+                case GameState.Menu: // --- Menu ------------------------------------------------//
+                    foreach (Button button in buttons[0])
+                    {
+                        button.Update(gt);
+                    }
+                    if (buttons[0][0].IsPressed) { gameFSM = GameState.Game; }
+                    if (buttons[0][1].IsPressed) { gameFSM = GameState.Settings; }
+                    if (buttons[0][2].IsPressed) { gameFSM = GameState.Credits; }
+
+                    break;
+
+                case GameState.Settings: // --- Settings ----------------------------------------//
+                    foreach (Button button in buttons[1])
+                    {
+                        button.Update(gt);
+                    }
+                    if (buttons[1][0].IsPressed) { gameFSM = GameState.Menu; }
+                    break;
+
+                case GameState.Credits: // --- Credits -------------------------------------------//
+                    foreach (Button button in buttons[2])
+                    {
+                        button.Update(gt);
+                    }
+                    if (buttons[2][0].IsPressed) { gameFSM = GameState.Menu; }
+                    break;
+
+                case GameState.Game: // --- Game ------------------------------------------------//
+                    foreach (Button button in buttons[3])
+                    {
+                        button.Update(gt);
+                    }
+
+                    if (Keyboard.GetState().IsKeyDown(Keys.Back)) { gameFSM = GameState.GameOver; }
+                    break;
+
+                case GameState.GameOver: // --- GameOver ----------------------------------------//
+                    foreach (Button button in buttons[4])
+                    {
+                        button.Update(gt);
+                    }
+                    if (buttons[4][0].IsPressed) { gameFSM = GameState.Menu; }
+                    break;
             }
         }
 
@@ -105,12 +155,139 @@ namespace UndeadKnights
         /// <param name="sb"></param>
         public void Draw(SpriteBatch sb)
         {
+            
+            // Menu finite state machine
             switch (gameFSM)
             {
-                case GameState.Menu:
-                    testButton.Draw(sb);
+                case GameState.Menu: // --- Menu ------------------------------------------------//
+
+                    // Draw the title
+                    sb.DrawString(vinque72,
+                        "Undead Knights",
+                        new Vector2(window.Width/12,window.Height/12),
+                        Color.Black);
+
+                    // Draw all the buttons
+                    foreach (Button button in buttons[0])
+                    {
+                        button.Draw(sb);
+                    }
+                    break;
+
+                case GameState.Settings: // --- Settings ----------------------------------------//
+
+                    // Draw the title
+                    sb.DrawString(vinque72,
+                        "Settings",
+                        new Vector2(window.Width / 12, window.Height / 12),
+                        Color.Black);
+
+                    // Draw all the buttons
+                    foreach (Button button in buttons[1])
+                    {
+                        button.Draw(sb);
+                    }
+                    break;
+
+                case GameState.Credits: // --- Credits -------------------------------------------//
+
+                    // Draw the title
+                    sb.DrawString(vinque72,
+                        "Credits",
+                        new Vector2(window.Width / 12, window.Height / 12),
+                        Color.Black);
+
+                    // Draw all the buttons
+                    foreach (Button button in buttons[2])
+                    {
+                        button.Draw(sb);
+                    }
+                    break;
+
+                case GameState.Game: // --- Game ------------------------------------------------//
+                    
+                    // Draw all the buttons
+                    foreach (Button button in buttons[3])
+                    {
+                        button.Draw(sb);
+                    }
+                    break;
+
+                case GameState.GameOver: // --- GameOver ----------------------------------------//
+
+                    // Draw the title
+                    sb.DrawString(vinque72,
+                        "Game Over",
+                        new Vector2(3*window.Width / 12, 4*window.Height / 12),
+                        Color.Black);
+
+                    // Draw all the buttons
+                    foreach (Button button in buttons[4])
+                    {
+                        button.Draw(sb);
+                    }
                     break;
             }
+        }
+
+        private void CreateButtons(GraphicsDevice gd)
+        {
+            // Instantiate the list
+            buttons = new List<List<Button>> 
+            { 
+                new List<Button>(),
+                new List<Button>(),
+                new List<Button>(),
+                new List<Button>(),
+                new List<Button>(),
+            };
+
+            // --- Menu ----------------------------------------//
+            buttons[0].Add(new Button(new Rectangle(1*window.Width/12,8*window.Height/24,   // X,Y
+                3*window.Width/12,1*window.Height/12),                                      // Width,Height
+                "Play",     // Text
+                gd,         // Graphics Device
+                vinque48)); // Font
+
+            buttons[0].Add(new Button(new Rectangle(1 * window.Width / 12, 11 * window.Height / 24,   // X,Y
+                3 * window.Width / 12, 1 * window.Height / 12),                                      // Width,Height
+                "Settings",     // Text
+                gd,         // Graphics Device
+                vinque48)); // Font
+
+            buttons[0].Add(new Button(new Rectangle(1 * window.Width / 12, 14 * window.Height / 24,   // X,Y
+                3 * window.Width / 12, 1 * window.Height / 12),                                      // Width,Height
+                "Credits",     // Text
+                gd,         // Graphics Device
+                vinque48)); // Font
+
+            buttons[0].Add(new Button(new Rectangle(1 * window.Width / 12, 17 * window.Height / 24,   // X,Y
+                3 * window.Width / 12, 1 * window.Height / 12),                                      // Width,Height
+                "Quit",     // Text
+                gd,         // Graphics Device
+                vinque48)); // Font
+
+
+            // --- Settings  ----------------------------------------//
+            buttons[1].Add(new Button(new Rectangle(1 * window.Width / 12, 21 * window.Height / 24,   // X,Y
+                3 * window.Width / 12, 1 * window.Height / 12),                                      // Width,Height
+                "Return to Menu",     // Text
+                gd,         // Graphics Device
+                vinque48)); // Font
+
+            // --- Credits  ----------------------------------------//
+            buttons[2].Add(new Button(new Rectangle(1 * window.Width / 12, 21 * window.Height / 24,   // X,Y
+                3 * window.Width / 12, 1 * window.Height / 12),                                      // Width,Height
+                "Return to Menu",     // Text
+                gd,         // Graphics Device
+                vinque48)); // Font
+
+            // ---  GameOver ----------------------------------------//
+            buttons[4].Add(new Button(new Rectangle(9 * window.Width / 24, 15 * window.Height / 24,   // X,Y
+                3 * window.Width / 12, 1 * window.Height / 12),                                      // Width,Height
+                "Return to Menu",     // Text
+                gd,         // Graphics Device
+                vinque48)); // Font
         }
 
     }
