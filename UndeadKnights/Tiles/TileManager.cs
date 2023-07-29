@@ -18,6 +18,24 @@ using System.Security.Cryptography;
 
 namespace UndeadKnights.Tiles
 {
+    enum TileType
+    {
+        Grass,
+        Path,
+        Tree,
+        Rock,
+        TownHall,
+        House,
+        Farm,
+        Wall,
+        Gate,
+        Turret,
+        Armory,
+        ShootingRange,
+        Stable,
+        Ballista
+    }
+
     internal class TileManager
     {
         // --- Fields --- //
@@ -56,18 +74,25 @@ namespace UndeadKnights.Tiles
            Point windowsize, GraphicsDevice gd)
         {
             // Create new grid of tiles
-            tileGrid = new Tile[50, 50];
+            tileGrid = new Tile[51, 51];
             environmentSpriteSheet = content.Load<Texture2D>("EnvironmentSpriteSheet");
 
+            // Create randomifier
             rng = new Random();
-            for (int i = 0; i < 50; i++)
+
+            // Set all to grass
+            for (int i = 0; i < 51; i++)
             {
-                for (int j = 0; j < 50; j++)
+                for (int j = 0; j < 51; j++)
                 {
-                    tileGrid[i, j] = new Tile(environmentSpriteSheet, 
-                        new Point(rng.Next(0, 2), rng.Next(0, 2)));
+                    tileGrid[i, j] = new Tile(TileType.Grass,environmentSpriteSheet);
                 }
             }
+
+            // Set middle to town hall
+            // (right now its path because i dont have a town hall
+            GeneratePath();
+            tileGrid[25,25] = new Tile(TileType.Path,environmentSpriteSheet);
         }
 
 
@@ -89,13 +114,68 @@ namespace UndeadKnights.Tiles
         /// <param name="sb"></param>
         public void Draw(SpriteBatch sb)
         {
-            for (int i = 0; i < 50; i++)
+            for (int i = 0; i < 51; i++)
             {
-                for (int j = 0; j < 50; j++)
+                for (int j = 0; j < 51; j++)
                 {
                     tileGrid[i, j].Draw(sb, new Point(i, j));
                 }
             }
+        }
+
+        /// <summary>
+        /// Generates the path that the enemies will come from
+        /// </summary>
+        public void GeneratePath()
+        {
+            for (int i = 25; i < 51; i++)
+            {
+                tileGrid[25, i] = new Tile(TileType.Path, environmentSpriteSheet);
+            }
+            FillGrass(20);
+        }
+
+        /// <summary>
+        /// Replaces grass with other resources
+        /// </summary>
+        /// <param name="GrassPercentLeft"> Percent of tiles that will remain grass</param>
+        public void FillGrass(int GrassPercentLeft)
+        {
+            // Loop for every tile
+            for (int x = 0; x < 51; x++)
+            {
+                for (int y = 0; y < 51; y++)
+                {
+                    // Check if its grass
+                    if (tileGrid[x,y].TileType == TileType.Grass)
+                    {
+                        // If it is do rng to change to tree or rock
+                        if (rng.Next(0,100) > GrassPercentLeft)
+                        {
+                            // Determine if its will be a rock or tree
+                            if (rng.Next(0, 100) > 20)
+                            {
+                                tileGrid[x, y] = new Tile(TileType.Tree, environmentSpriteSheet);
+                            }
+                            else
+                            {
+                                tileGrid[x, y] = new Tile(TileType.Rock, environmentSpriteSheet);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+
+        public int NearestPath(int x, int y)
+        {
+            int distance = 0;
+            for (int i = 0; i < distance; i++)
+            {
+
+            }
+            return 0;
         }
     }
 }

@@ -66,7 +66,7 @@ namespace UndeadKnights
         {
             vinque24 = content.Load<SpriteFont>("vinque-24");
             tileSize = 50;
-            camera = new Point(0, 0);
+            camera = new Point(155, 370);
 
             currentKS = Keyboard.GetState();
             previousKS = Keyboard.GetState();
@@ -88,8 +88,8 @@ namespace UndeadKnights
                 currentKS = Keyboard.GetState();
 
                 // Zoom controls
-                if (tileSize < 200 && currentKS.IsKeyDown(Keys.Up)) { tileSize += 2;}
-                if (tileSize > 50 && currentKS.IsKeyDown(Keys.Down)) { tileSize -= 2;}
+                if (tileSize < 200 && SingleKeyPress(Keys.Up)) { tileSize += 25;}
+                if (tileSize > 50 && SingleKeyPress(Keys.Down)) { tileSize -= 25;}
 
                 // Move camera controls
                 if (currentKS.IsKeyDown(Keys.A)) { camera.X-=5; }
@@ -101,8 +101,8 @@ namespace UndeadKnights
                 if (camera.X < 0) { camera.X = 0; }
                 if (camera.Y < 0) { camera.Y = 0; }
                 // Formula assumes that window size is 1920x1080
-                if (camera.X > 1250-1920/(tileSize/25)) { camera.X = 1250 - 1920 / (tileSize / 25); }
-                if (camera.Y > 1250-1080/(tileSize/25)) { camera.Y = 1250 - 1080 / (tileSize / 25); }
+                if (camera.X > 1275-1920/(tileSize/25)) { camera.X = 1275 - 1920 / (tileSize / 25); }
+                if (camera.Y > 1275-1080/(tileSize/25)) { camera.Y = 1275 - 1080 / (tileSize / 25); }
 
                 previousKS = currentKS;
             }
@@ -120,8 +120,8 @@ namespace UndeadKnights
             }
 
             // Draw Camera Position
-            sb.DrawString(vinque24,$"({Camera.X},{Camera.Y}) : {tileSize} " +
-                $": {1250 - 1080 / (tileSize / 25)}",new Vector2(10,10),Color.White);
+            sb.DrawString(vinque24,$"({Camera.X},{Camera.Y}) : {tileSize} ",
+                new Vector2(10,10),Color.White);
         }
 
         /// <summary>

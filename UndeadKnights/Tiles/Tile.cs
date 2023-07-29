@@ -21,20 +21,37 @@ namespace UndeadKnights.Tiles
 
         private Texture2D texture;
         private Point spriteLocation;
+        private TileType tileType;
 
 
         // --- Properties --- //
 
-
+        public TileType TileType { get { return tileType; } }
 
 
 
         // --- Constructor --- //
 
-        public Tile(Texture2D texture, Point spriteLocation)
+        public Tile(TileType tileType, Texture2D texture)
         {
             this.texture = texture;
-            this.spriteLocation = spriteLocation;
+            this.tileType = tileType;
+
+            switch (tileType)
+            {
+                case TileType.Grass:
+                    this.spriteLocation = new Point(1, 0);
+                    break;
+                case TileType.Path:
+                    this.spriteLocation = new Point(0, 0);
+                    break;
+                case TileType.Tree:
+                    this.spriteLocation = new Point(0, 1);
+                    break;
+                case TileType.Rock:
+                    this.spriteLocation = new Point(1,1);
+                    break;
+            }
         }
 
 
