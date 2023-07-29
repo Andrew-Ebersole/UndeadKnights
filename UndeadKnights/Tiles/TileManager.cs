@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.ComponentModel;
 using Microsoft.Xna.Framework.Content;
 using System.Security.Cryptography;
+using System.IO;
 
 // ---------------------------------------------------------------- //
 // Collaborators | Andrew Ebersole
@@ -80,19 +81,7 @@ namespace UndeadKnights.Tiles
             // Create randomifier
             rng = new Random();
 
-            // Set all to grass
-            for (int i = 0; i < 51; i++)
-            {
-                for (int j = 0; j < 51; j++)
-                {
-                    tileGrid[i, j] = new Tile(TileType.Grass,environmentSpriteSheet);
-                }
-            }
-
-            // Set middle to town hall
-            // (right now its path because i dont have a town hall
-            GeneratePath();
-            tileGrid[25,25] = new Tile(TileType.Path,environmentSpriteSheet);
+            NewMap();
         }
 
 
@@ -123,28 +112,104 @@ namespace UndeadKnights.Tiles
             }
         }
 
+
+        public void NewMap()
+        {
+            // Set all to grass
+            for (int i = 0; i < 51; i++)
+            {
+                for (int j = 0; j < 51; j++)
+                {
+                    tileGrid[i, j] = new Tile(TileType.Grass, environmentSpriteSheet);
+                }
+            }
+
+            // Set middle to town hall
+            tileGrid[25, 25] = new Tile(TileType.Path, environmentSpriteSheet);
+
+            // (right now its path because i dont have a town hall
+            GeneratePath();
+        }
+
         /// <summary>
         /// Generates the path that the enemies will come from
         /// </summary>
         public void GeneratePath()
         {
-            // Right now path is hard coded
-            // down the line will either use file reading or
-            // preferrably procedurally generated paths
-            for (int y = 25; y < 38; y++)
-            {
-                tileGrid[25, y] = new Tile(TileType.Path, environmentSpriteSheet);
-            }
-            for (int x = 25; x < 36; x++)
-            {
-                tileGrid[x, 38] = new Tile(TileType.Path, environmentSpriteSheet);
-            }
-            for (int y = 38; y < 51; y++)
-            {
-                tileGrid[36, y] = new Tile(TileType.Path, environmentSpriteSheet);
-            }
+            FillPath(new Point(25,25),new Point(0,rng.Next(0,51)));
+            FillPath(new Point(25, 25), new Point(rng.Next(0, 51), 50));
+            FillPath(new Point(25, 25), new Point(50, rng.Next(0, 51)));
+
             FillGrass(20);
         }
+
+        /// <summary>
+        /// Generates a path between two points
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        public void FillPath(Point start, Point end)
+        {
+            if (tileGrid[end.X,end.Y].TileType != TileType.Path)
+            {
+
+                // Start by whichever direction is farther
+                if (Math.Abs(start.X - end.X) >Math.Abs(start.Y - end.Y))
+                {
+                    // Move toward X a random amount of times
+                    if (start.X < end.X)
+                    {
+                        for (int i = 0; i < rng.Next(2, 5); i++)
+                        {
+                            if (start.X > 0 && start.X < 50)
+                            {
+                                start.X++;
+                                tileGrid[start.X, start.Y] = new Tile(TileType.Path, environmentSpriteSheet);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        for (int i = 0; i < rng.Next(2, 5); i++)
+                        {
+                            if (start.X > 0 && start.X < 50)
+                            {
+                                start.X--;
+                                tileGrid[start.X, start.Y] = new Tile(TileType.Path, environmentSpriteSheet);
+                            }
+                        }
+                    }
+                } else
+                {
+                    // Move toward end in Y direction a random amount of times
+                    if (start.Y < end.Y)
+                    {
+                        for (int i = 0; i < rng.Next(2, 5); i++)
+                        {
+                            if (start.Y > 0 && start.Y < 50)
+                            {
+                                start.Y++;
+                                tileGrid[start.X, start.Y] = new Tile(TileType.Path, environmentSpriteSheet);
+                            }
+                        }
+                    } else
+                    {
+                        for (int i = 0; i < rng.Next(3, 5); i++)
+                        {
+                            if (start.Y > 0 && start.Y < 50)
+                            {
+                                start.Y--;
+                                tileGrid[start.X, start.Y] = new Tile(TileType.Path, environmentSpriteSheet);
+                            }
+                        }
+                    }
+                }
+
+                // Reccurs until at the end
+                FillPath(start, end);
+            }
+        }
+
         /// <summary>
         /// Replaces grass with other resources
         /// </summary>
@@ -166,7 +231,7 @@ namespace UndeadKnights.Tiles
                             if (rng.Next(0, 100) > 20)
                             {
                                 // If the tree is near a path dont spawn (with randomization)
-                                if (rng.Next(2,5) < NearestPath(x, y))
+                                if (rng.Next(1,3) < NearestPath(x, y))
                                 {
                                     tileGrid[x, y] = new Tile(TileType.Tree, environmentSpriteSheet);
                                 }
@@ -174,7 +239,7 @@ namespace UndeadKnights.Tiles
                             else
                             {
                                 // If the rock is near a path dont spawn (with randomization)
-                                if (rng.Next(5,10) < NearestPath(x, y))
+                                if (rng.Next(3,8) < NearestPath(x, y))
                                 {
                                     tileGrid[x, y] = new Tile(TileType.Rock, environmentSpriteSheet);
                                 }

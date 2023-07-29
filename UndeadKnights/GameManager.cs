@@ -65,8 +65,6 @@ namespace UndeadKnights
            Point windowsize, GraphicsDevice gd)
         {
             vinque24 = content.Load<SpriteFont>("vinque-24");
-            tileSize = 50;
-            camera = new Point(155, 370);
 
             currentKS = Keyboard.GetState();
             previousKS = Keyboard.GetState();
@@ -137,6 +135,13 @@ namespace UndeadKnights
                 return true;
             }
             return false;
+        }
+
+        public void NewGame()
+        {
+            TileManager.Get.NewMap();
+            tileSize = 50;
+            camera = new Point(155, 370);
         }
     }
 }

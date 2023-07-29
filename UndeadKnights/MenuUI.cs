@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UndeadKnights.Tiles;
 
 // ---------------------------------------------------------------- //
 // Collaborators | Andrew Ebersole
@@ -112,6 +113,7 @@ namespace UndeadKnights
                     { 
                         gameFSM = GameState.Game;
                         GameManager.Get.PlayTime = 0;
+                        GameManager.Get.NewGame();
                     }
                     if (buttons[0][1].IsPressed) { gameFSM = GameState.Settings; }
                     if (buttons[0][2].IsPressed) { gameFSM = GameState.Credits; }
