@@ -19,9 +19,9 @@ namespace UndeadKnights.Tiles
     {
         // --- Fields --- //
 
-        private Texture2D texture;
-        private Point spriteLocation;
-        private TileType tileType;
+        protected Texture2D texture;
+        protected Point spriteLocation;
+        protected TileType tileType;
 
 
         // --- Properties --- //

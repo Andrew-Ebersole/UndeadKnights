@@ -44,6 +44,7 @@ namespace UndeadKnights.Tiles
         // Tile Grid
         private Tile[,] tileGrid;
         private Texture2D environmentSpriteSheet;
+        private Texture2D buildingSpriteSheet;
         private Random rng;
 
         //Singleton
@@ -77,7 +78,7 @@ namespace UndeadKnights.Tiles
             // Create new grid of tiles
             tileGrid = new Tile[51, 51];
             environmentSpriteSheet = content.Load<Texture2D>("EnvironmentSpriteSheet");
-
+            buildingSpriteSheet = content.Load<Texture2D>("Buildings");
             // Create randomifier
             rng = new Random();
 
@@ -124,11 +125,11 @@ namespace UndeadKnights.Tiles
                 }
             }
 
-            // Set middle to town hall
-            tileGrid[25, 25] = new Tile(TileType.Path, environmentSpriteSheet);
-
             // (right now its path because i dont have a town hall
             GeneratePath();
+
+            // Set middle to town hall
+            tileGrid[25, 25] = new Building(TileType.TownHall, buildingSpriteSheet, 200, 1);
         }
 
         /// <summary>
