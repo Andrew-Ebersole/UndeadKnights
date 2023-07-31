@@ -69,7 +69,7 @@ namespace UndeadKnights
                 Exit();
 
             // Update Menu UI
-            MenuUI.Get.Update(gameTime);
+            MenuUI.Get.Update(gameTime, _graphics);
             GameManager.Get.Update(gameTime);
 
             // Check if quit button was pressed

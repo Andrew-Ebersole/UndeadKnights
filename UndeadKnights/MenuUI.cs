@@ -99,7 +99,7 @@ namespace UndeadKnights
         /// Called every frame to update functions
         /// </summary>
         /// <param name="gt"></param>
-        public void Update(GameTime gt)
+        public void Update(GameTime gt, GraphicsDeviceManager graphicsDevice)
         {
             // Menu finite state machine
             switch (gameFSM)
@@ -126,6 +126,19 @@ namespace UndeadKnights
                         button.Update(gt);
                     }
                     if (buttons[1][0].IsPressed) { gameFSM = GameState.Menu; }
+                    if (buttons[1][1].IsPressed)
+                    {
+                        if (graphicsDevice.IsFullScreen == false)
+                        {
+                            graphicsDevice.IsFullScreen = true;
+                            buttons[1][1].Text = "true";
+                        } else
+                        {
+                            graphicsDevice.IsFullScreen = false;
+                            buttons[1][1].Text = "false";
+                        }
+                        graphicsDevice.ApplyChanges();
+                    }
                     break;
 
                 case GameState.Credits: // --- Credits -------------------------------------------//
@@ -186,6 +199,11 @@ namespace UndeadKnights
                     sb.DrawString(vinque72,
                         "Settings",
                         new Vector2(window.Width / 12, window.Height / 12),
+                        Color.Black);
+
+                    sb.DrawString(vinque48,
+                        "Fullscreen",
+                        new Vector2(window.Width / 12, 4*window.Height / 12),
                         Color.Black);
 
                     // Draw all the buttons
@@ -278,6 +296,12 @@ namespace UndeadKnights
             buttons[1].Add(new Button(new Rectangle(1 * window.Width / 12, 21 * window.Height / 24,   // X,Y
                 3 * window.Width / 12, 1 * window.Height / 12),                                      // Width,Height
                 "Return to Menu",     // Text
+                gd,         // Graphics Device
+                vinque48)); // Font
+
+            buttons[1].Add(new Button(new Rectangle(6 * window.Width / 12, 4 * window.Height / 12,   // X,Y
+                3 * window.Width / 12, 1 * window.Height / 12),                                      // Width,Height
+                "False",    // Text
                 gd,         // Graphics Device
                 vinque48)); // Font
 

@@ -131,6 +131,9 @@ namespace UndeadKnights
                 // update timer
                 playTime += gt.ElapsedGameTime.Milliseconds;
 
+                // update subclasses
+                TileManager.Get.Update(gt);
+
                 previousKS = currentKS;
             }
         }

@@ -95,7 +95,13 @@ namespace UndeadKnights.Tiles
         /// <param name="gt"></param>
         public void Update(GameTime gt)
         {
-
+            for (int i = 0; i < 51; i++)
+            {
+                for (int j = 0; j < 51; j++)
+                {
+                    tileGrid[i, j].Update(gt, new Point(i, j));
+                }
+            }
         }
 
         /// <summary>
@@ -108,7 +114,7 @@ namespace UndeadKnights.Tiles
             {
                 for (int j = 0; j < 51; j++)
                 {
-                    tileGrid[i, j].Draw(sb, new Point(i, j));
+                    tileGrid[i, j].Draw(sb);
                 }
             }
         }
