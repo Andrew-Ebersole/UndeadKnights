@@ -15,7 +15,7 @@ using Microsoft.Xna.Framework.Input;
 // ---------------------------------------------------------------- //
 // Collaborators | Andrew Ebersole
 // Created Date  | 7-26-23
-// Last Update   | 7-30-23
+// Last Update   | 7-31-23
 // Purpose       | Manages all the content in the game, updates all
 //               | The players, monsters, and tiles
 // ---------------------------------------------------------------- //
@@ -45,6 +45,7 @@ namespace UndeadKnights
         private int wood;
         private int stone;
         private int food;
+        private int people;
 
         // Singleton
         private static GameManager instance = null;
@@ -74,6 +75,8 @@ namespace UndeadKnights
         public int Wood { get { return wood; } set {  wood = value; } }
         public int Stone { get {  return stone; } set {  stone = value; } }
         public int Food { get { return food; } set {  food = value; } }
+        public int People { get { return people; } set { people = value; } }
+
 
         // --- Constructor --- //
 
@@ -85,9 +88,11 @@ namespace UndeadKnights
             currentKS = Keyboard.GetState();
             previousKS = Keyboard.GetState();
 
+            // Starting materials
             wood = 10;
             stone = 10;
             food = 10;
+            people = 10;
 
             TileManager.Get.Initialize(content, windowsize, gd);
         }

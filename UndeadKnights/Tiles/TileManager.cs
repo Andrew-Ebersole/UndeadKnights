@@ -54,7 +54,7 @@ namespace UndeadKnights.Tiles
         private List<Button> usedButtons;
 
         // Upgraded tile
-        private Tile upgradedTile;
+        private Point upgradedTile;
 
         // Fonts
         private SpriteFont vinque24;
@@ -94,6 +94,7 @@ namespace UndeadKnights.Tiles
         {
             // Create new grid of tiles
             tileGrid = new Tile[51, 51];
+
             environmentSpriteSheet = content.Load<Texture2D>("EnvironmentSpriteSheet");
             buildingSpriteSheet = content.Load<Texture2D>("Buildings");
             // Create randomifier
@@ -143,12 +144,92 @@ namespace UndeadKnights.Tiles
                 if (b.IsPressed)
                 {
                     clickedOff = false;
-                    System.Diagnostics.Debug.WriteLine(b.IsPressed);
                 }
             }
             if (clickedOff)
             {
                 usedButtons.Clear();
+            }
+            else
+            {
+                // Build building if have enough resources
+                foreach (Button b in usedButtons)
+                {
+                    if (b.IsPressed)
+                    {
+                        clickedOff = true;
+
+                        // House
+                        if (b == buttons[1] && GameManager.Get.Wood >= 2)
+                        {
+                            tileGrid[upgradedTile.X, upgradedTile.Y] = new Building(TileType.House, buildingSpriteSheet, 50, 1);
+                            GameManager.Get.Wood -= 2;
+                        }
+
+                        // Farm
+                        if (b == buttons[2] && GameManager.Get.People >= 1)
+                        {
+                            tileGrid[upgradedTile.X, upgradedTile.Y] = new Building(TileType.Farm, buildingSpriteSheet, 10, 1);
+                            GameManager.Get.People -= 1;
+                        }
+
+                        // Armory
+                        if (b == buttons[3] && GameManager.Get.Stone >= 3)
+                        {
+                            tileGrid[upgradedTile.X, upgradedTile.Y] = new Building(TileType.Armory, buildingSpriteSheet, 100, 1);
+                            GameManager.Get.Stone -= 3;
+                        }
+
+                        // Archery
+                        if (b == buttons[4] && GameManager.Get.Wood >= 3)
+                        {
+                            tileGrid[upgradedTile.X, upgradedTile.Y] = new Building(TileType.ShootingRange, buildingSpriteSheet, 100, 1);
+                            GameManager.Get.Wood -= 3;
+                        }
+
+                        // Stable
+                        if (b == buttons[5] && GameManager.Get.Wood >= 5)
+                        {
+                            tileGrid[upgradedTile.X, upgradedTile.Y] = new Building(TileType.Stable, buildingSpriteSheet, 100, 1);
+                            GameManager.Get.Wood -= 5;
+                        }
+
+                        // Wall 
+                        if (b == buttons[6] && GameManager.Get.Wood >= 1)
+                        {
+                            tileGrid[upgradedTile.X, upgradedTile.Y] = new Building(TileType.Wall, buildingSpriteSheet, 75, 1);
+                            GameManager.Get.Wood -= 1;
+                        }
+
+                        // Gate
+                        if (b == buttons[7] && GameManager.Get.Wood >= 2)
+                        {
+                            tileGrid[upgradedTile.X, upgradedTile.Y] = new Building(TileType.Gate, buildingSpriteSheet, 75, 1);
+                            GameManager.Get.Wood -= 2;
+                        }
+
+                        // Turret
+                        if (b == buttons[8] && GameManager.Get.People >= 1)
+                        {
+                            tileGrid[upgradedTile.X, upgradedTile.Y] = new Building(TileType.Turret, buildingSpriteSheet, 100, 1);
+                            GameManager.Get.People -= 1;
+                        }
+
+                        // People
+                        if (b == buttons[2] && GameManager.Get.Food >= 1)
+                        {
+                            GameManager.Get.Food -= 1;
+                            GameManager.Get.People += 1;
+                        }
+
+                    }
+                }
+
+                if (clickedOff == true)
+                {
+                    // hide UI
+                    usedButtons.Clear();
+                }
             }
 
 
@@ -158,7 +239,7 @@ namespace UndeadKnights.Tiles
                 for (int j = 0; j < 51; j++)
                 {
                     tileGrid[i, j].Update(gt, new Point(i, j));
-                    
+
                     // Check when tile is clicked
                     if (tileGrid[i, j].IsPressed
                         && usedButtons.Count == 0
@@ -168,12 +249,14 @@ namespace UndeadKnights.Tiles
                         {
                             case TileType.Grass:
                                 UpgradeOptions(tileGrid[i, j], new List<TileType>() {
-                                    TileType.Farm, TileType.House, TileType.Armory, TileType.Wall});
+                                    TileType.Farm, TileType.House, TileType.Armory, TileType.Wall},
+                                    new Point(i, j));
                                 break;
 
                             case TileType.Path:
                                 UpgradeOptions(tileGrid[i, j], new List<TileType>() {
-                                    TileType.Gate});
+                                    TileType.Gate},
+                                    new Point(i, j));
                                 break;
 
                             case TileType.Tree:
@@ -187,46 +270,50 @@ namespace UndeadKnights.Tiles
                                 break;
 
                             case TileType.House:
-                                UpgradeOptions(tileGrid[i, j], new List<TileType>() {});
+                                UpgradeOptions(tileGrid[i, j], new List<TileType>() { },
+                                    new Point(i, j));
                                 break;
 
                             case TileType.FarmFull:
-                                tileGrid[i, j] = new Building(TileType.Farm, buildingSpriteSheet,10,1);
+                                tileGrid[i, j] = new Building(TileType.Farm, buildingSpriteSheet, 10, 1);
                                 GameManager.Get.Food += 1;
                                 break;
 
                             case TileType.Armory:
                                 UpgradeOptions(tileGrid[i, j], new List<TileType>() {
-                                    TileType.ShootingRange, TileType.Stable});
+                                    TileType.ShootingRange, TileType.Stable},
+                                    new Point(i, j));
                                 break;
 
                             case TileType.Wall:
                                 UpgradeOptions(tileGrid[i, j], new List<TileType>() {
-                                    TileType.Gate,TileType.Turret });
+                                    TileType.Gate,TileType.Turret },
+                                    new Point(i, j));
                                 break;
 
                             default:
-                                UpgradeOptions(tileGrid[i, j], new List<TileType>(){ });
+                                UpgradeOptions(tileGrid[i, j], new List<TileType>() { },
+                                    new Point(i, j));
                                 break;
 
                         }
                     }
 
                     // Grow farm
-                    if (tileGrid[i,j].TileType == TileType.Farm)
+                    if (tileGrid[i, j].TileType == TileType.Farm)
                     {
                         // If the farm has been around for 30 seconds it will grow into farm full
-                        Building newbuilding = (Building)tileGrid[i,j];
+                        Building newbuilding = (Building)tileGrid[i, j];
                         if (newbuilding.Timer > 30000)
                         {
                             tileGrid[i, j] = new Building
-                                (TileType.FarmFull,buildingSpriteSheet,10,newbuilding.Level);
+                                (TileType.FarmFull, buildingSpriteSheet, 10, newbuilding.Level);
                         }
                     }
                 }
             }
 
-            
+
 
             // This should remain at end of update
             previousMS = currentMS;
@@ -243,7 +330,7 @@ namespace UndeadKnights.Tiles
             {
                 for (int j = 0; j < 51; j++)
                 {
-                    tileGrid[i, j].Draw(sb, new Point(i,j));
+                    tileGrid[i, j].Draw(sb, new Point(i, j));
                 }
             }
 
@@ -280,7 +367,7 @@ namespace UndeadKnights.Tiles
         /// </summary>
         private void GeneratePath()
         {
-            FillPath(new Point(25,25),new Point(0,rng.Next(0,51)));
+            FillPath(new Point(25, 25), new Point(0, rng.Next(0, 51)));
             FillPath(new Point(25, 25), new Point(rng.Next(0, 51), 50));
             FillPath(new Point(25, 25), new Point(50, rng.Next(0, 51)));
 
@@ -294,16 +381,16 @@ namespace UndeadKnights.Tiles
         /// <param name="end"></param>
         private void FillPath(Point start, Point end)
         {
-            if (tileGrid[end.X,end.Y].TileType != TileType.Path)
+            if (tileGrid[end.X, end.Y].TileType != TileType.Path)
             {
 
                 // Start by whichever direction is farther
-                if (Math.Abs(start.X - end.X) >Math.Abs(start.Y - end.Y))
+                if (Math.Abs(start.X - end.X) > Math.Abs(start.Y - end.Y))
                 {
                     // Move toward X a random amount of times
                     if (start.X < end.X)
                     {
-                        for (int i = 0; i < rng.Next(1, Math.Abs((int)Math.Pow((start.X - end.X), 2) / 4)+1); i++)
+                        for (int i = 0; i < rng.Next(1, Math.Abs((int)Math.Pow((start.X - end.X), 2) / 4) + 1); i++)
                         {
                             if (start.X > 0 && start.X < 50)
                             {
@@ -314,7 +401,7 @@ namespace UndeadKnights.Tiles
                     }
                     else
                     {
-                        for (int i = 0; i < rng.Next(1, Math.Abs((int)Math.Pow((start.X - end.X), 2) / 4)+1); i++)
+                        for (int i = 0; i < rng.Next(1, Math.Abs((int)Math.Pow((start.X - end.X), 2) / 4) + 1); i++)
                         {
                             if (start.X > 0 && start.X < 50)
                             {
@@ -323,12 +410,13 @@ namespace UndeadKnights.Tiles
                             }
                         }
                     }
-                } else
+                }
+                else
                 {
                     // Move toward end in Y direction a random amount of times
                     if (start.Y < end.Y)
                     {
-                        for (int i = 0; i < rng.Next(1, Math.Abs((int)Math.Pow((start.Y - end.Y), 2) / 4)+1); i++)
+                        for (int i = 0; i < rng.Next(1, Math.Abs((int)Math.Pow((start.Y - end.Y), 2) / 4) + 1); i++)
                         {
                             if (start.Y > 0 && start.Y < 50)
                             {
@@ -336,9 +424,10 @@ namespace UndeadKnights.Tiles
                                 tileGrid[start.X, start.Y] = new Tile(TileType.Path, environmentSpriteSheet);
                             }
                         }
-                    } else
+                    }
+                    else
                     {
-                        for (int i = 0; i < rng.Next(1, Math.Abs((int)Math.Pow((start.Y - end.Y), 2) / 4)+1); i++)
+                        for (int i = 0; i < rng.Next(1, Math.Abs((int)Math.Pow((start.Y - end.Y), 2) / 4) + 1); i++)
                         {
                             if (start.Y > 0 && start.Y < 50)
                             {
@@ -366,16 +455,16 @@ namespace UndeadKnights.Tiles
                 for (int y = 0; y < 51; y++)
                 {
                     // Check if its grass
-                    if (tileGrid[x,y].TileType == TileType.Grass)
+                    if (tileGrid[x, y].TileType == TileType.Grass)
                     {
                         // If it is do rng to change to tree or rock
-                        if (rng.Next(0,100) > GrassPercentLeft)
+                        if (rng.Next(0, 100) > GrassPercentLeft)
                         {
                             // Determine if its will be a rock or tree
                             if (rng.Next(0, 100) > 20)
                             {
                                 // If the tree is near a path dont spawn (with randomization)
-                                if (rng.Next(1,3) < NearestPath(x, y))
+                                if (rng.Next(1, 3) < NearestPath(x, y))
                                 {
                                     tileGrid[x, y] = new Tile(TileType.Tree, environmentSpriteSheet);
                                 }
@@ -383,7 +472,7 @@ namespace UndeadKnights.Tiles
                             else
                             {
                                 // If the rock is near a path dont spawn (with randomization)
-                                if (rng.Next(3,8) < NearestPath(x, y))
+                                if (rng.Next(3, 8) < NearestPath(x, y))
                                 {
                                     tileGrid[x, y] = new Tile(TileType.Rock, environmentSpriteSheet);
                                 }
@@ -406,7 +495,7 @@ namespace UndeadKnights.Tiles
         {
             int distance = 0;
 
-            
+
             // Keep going until found path or distnace is greater than 11
             while (distance < 11)
             {
@@ -421,8 +510,8 @@ namespace UndeadKnights.Tiles
                 // Right to down
                 while (y < distance)
                 {
-                    x-=1;
-                    y+=1;
+                    x -= 1;
+                    y += 1;
                     if (IsPath(startingX + x, startingY + y))
                     {
                         return distance;
@@ -431,8 +520,8 @@ namespace UndeadKnights.Tiles
                 // down to left
                 while (x > -distance)
                 {
-                    x-=1;
-                    y-=1;
+                    x -= 1;
+                    y -= 1;
                     if (IsPath(startingX + x, startingY + y))
                     {
                         return distance;
@@ -441,8 +530,8 @@ namespace UndeadKnights.Tiles
                 // Left to up
                 while (y > -distance)
                 {
-                    x+=1;
-                    y-=1;
+                    x += 1;
+                    y -= 1;
                     if (IsPath(startingX + x, startingY + y))
                     {
                         return distance;
@@ -451,8 +540,8 @@ namespace UndeadKnights.Tiles
                 // up to right
                 while (x < distance)
                 {
-                    x+=1;
-                    y+=1;
+                    x += 1;
+                    y += 1;
                     if (IsPath(startingX + x, startingY + y))
                     {
                         return distance;
@@ -461,7 +550,7 @@ namespace UndeadKnights.Tiles
                 // increase distance
                 distance++;
             }
-            
+
             return distance;
         }
 
@@ -474,11 +563,11 @@ namespace UndeadKnights.Tiles
         private bool IsPath(int x, int y)
         {
             if (x >= 0 && y >= 0
-                && x <51 && y < 51)
+                && x < 51 && y < 51)
             {
                 if (tileGrid[x, y].TileType != TileType.Grass
-                    && tileGrid[x,y].TileType != TileType.Tree
-                    && tileGrid[x,y].TileType != TileType.Rock)
+                    && tileGrid[x, y].TileType != TileType.Tree
+                    && tileGrid[x, y].TileType != TileType.Rock)
                 {
                     return true;
                 }
@@ -491,9 +580,9 @@ namespace UndeadKnights.Tiles
         /// </summary>
         /// <param name="clickedTile"> The tile that is being upgraded</param>
         /// <param name="tileTypes"> The different types of tiles that it can be turned into </param>
-        private void UpgradeOptions(Tile clickedTile, List<TileType> tileTypes)
+        private void UpgradeOptions(Tile clickedTile, List<TileType> tileTypes, Point tilePosition)
         {
-            upgradedTile = clickedTile;
+            upgradedTile = tilePosition;
             usedButtons.Clear();
             usedButtons.Add(buttons[0]);
 
@@ -528,20 +617,21 @@ namespace UndeadKnights.Tiles
                         break;
                 }
 
-                // If the clicked tile contains people add the add people buttons
-                if (clickedTile.TileType == TileType.House
-                    || clickedTile.TileType == TileType.Armory
-                    || clickedTile.TileType == TileType.ShootingRange
-                    || clickedTile.TileType == TileType.Stable)
-                {
-                    usedButtons.Add(buttons[9]);
-                }
+            }
+
+            // If the clicked tile contains people add the add people buttons
+            if (clickedTile.TileType == TileType.House
+                || clickedTile.TileType == TileType.Armory
+                || clickedTile.TileType == TileType.ShootingRange
+                || clickedTile.TileType == TileType.Stable)
+            {
+                usedButtons.Add(buttons[9]);
             }
 
             // Moves the UI to the middle of screen
-            usedButtons[0].PositionRectangle = new Rectangle(960-tileTypes.Count*75-25, 440, 150 * tileTypes.Count + 50, 200);
+            usedButtons[0].PositionRectangle = new Rectangle(960 - tileTypes.Count * 75 - 25, 440, 150 * tileTypes.Count + 50, 200);
 
-            for (int i = 1; i < usedButtons.Count; i++) 
+            for (int i = 1; i < usedButtons.Count; i++)
             {
                 usedButtons[i].PositionRectangle =
                     new Rectangle(usedButtons[0].PositionRectangle.X + 25 + 150 * (i - 1),
@@ -590,7 +680,7 @@ namespace UndeadKnights.Tiles
                 "Turret", gd, vinque24));
 
             // Add People
-            buttons.Add(new Button(new Rectangle(-1000, -1000, 100, 50),
+            buttons.Add(new Button(new Rectangle(-1000, -1000, 150, 150),
                 "People", gd, vinque24));
         }
     }
