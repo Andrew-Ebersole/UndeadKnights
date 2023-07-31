@@ -23,6 +23,7 @@ namespace UndeadKnights.Tiles
         private int level;
         private int people;
         private int maxPeople;
+        private double timer;
         
 
 
@@ -36,7 +37,7 @@ namespace UndeadKnights.Tiles
 
         public int MaxPeople { get { return maxPeople; } }
 
-
+        public double Timer { get { return timer; } }
 
         // --- Constructor --- //
 
@@ -45,11 +46,15 @@ namespace UndeadKnights.Tiles
         {
             this.health = health;
             this.level = level;
+            timer = 0;
 
             switch (tileType)
             {
                 case TileType.Farm:
                     this.spriteLocation = new Point(1, 0);
+                    break;
+                case TileType.FarmFull:
+                    this.spriteLocation = new Point(2, 0);
                     break;
                 case TileType.TownHall:
                     this.spriteLocation = new Point(3, 0);
@@ -73,7 +78,11 @@ namespace UndeadKnights.Tiles
 
         // --- Methods --- //
 
-
+        public override void Update(GameTime gt, Point location)
+        {
+            base.Update(gt,location);
+            timer += gt.ElapsedGameTime.Milliseconds;
+        }
 
 
 

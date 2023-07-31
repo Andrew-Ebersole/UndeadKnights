@@ -11,7 +11,7 @@ using System.Runtime.CompilerServices;
 // ---------------------------------------------------------------- //
 // Collaborators | Andrew Ebersole
 // Created Date  | 7-26-23
-// Last Update   | 7-29-23
+// Last Update   | 7-31-23
 // Purpose       | Makes up a multitude of different tiles
 // ---------------------------------------------------------------- //
 
@@ -71,7 +71,7 @@ namespace UndeadKnights.Tiles
 
             // Mouse States
             currentMS = new MouseState();
-            previousMS = new MouseState();
+            previousMS = Mouse.GetState();
         }
 
 
@@ -82,7 +82,7 @@ namespace UndeadKnights.Tiles
         /// Called every frame to update functions
         /// </summary>
         /// <param name="gt"></param>
-        public void Update(GameTime gt, Point location)
+        public virtual void Update(GameTime gt, Point location)
         {
             // Get the current mouse state
             currentMS = Mouse.GetState();
@@ -133,8 +133,16 @@ namespace UndeadKnights.Tiles
         /// Called every frame to update graphical elements
         /// </summary>
         /// <param name="sb"></param>
-        public void Draw(SpriteBatch sb)
+        public void Draw(SpriteBatch sb, Point location)
         {
+            // Find the current tile size
+            int tileSize = GameManager.Get.TileSize;
+
+            // Find the locaiton in the grid
+            tilePos = new Rectangle(tileSize * location.X - GameManager.Get.Camera.X * tileSize / 25
+               , tileSize * location.Y - GameManager.Get.Camera.Y * tileSize / 25
+               , tileSize, tileSize);
+
             // Highlight hovered tile but hide if still for 2 seconds
             if (isHovered && hoverTimer < 1000)
             {

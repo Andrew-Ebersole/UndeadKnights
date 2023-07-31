@@ -180,10 +180,16 @@ namespace UndeadKnights
             {
                 case GameState.Menu: // --- Menu ------------------------------------------------//
 
+                    // Draw the title shadow
+                    sb.DrawString(vinque72,
+                        "Undead Knights",
+                        new Vector2(window.Width/12+2,window.Height/12+2),
+                        Color.DarkRed);
+
                     // Draw the title
                     sb.DrawString(vinque72,
                         "Undead Knights",
-                        new Vector2(window.Width/12,window.Height/12),
+                        new Vector2(window.Width / 12, window.Height / 12),
                         Color.Black);
 
                     // Draw all the buttons
@@ -239,11 +245,17 @@ namespace UndeadKnights
 
                 case GameState.GameOver: // --- GameOver ----------------------------------------//
 
+                    // Draw the title shadow
+                    sb.DrawString(vinque72,
+                        "Game Over",
+                        new Vector2(3*window.Width / 12+3, 4*window.Height / 12+3),
+                        Color.Black);
+
                     // Draw the title
                     sb.DrawString(vinque72,
                         "Game Over",
-                        new Vector2(3*window.Width / 12, 4*window.Height / 12),
-                        Color.Black);
+                        new Vector2(3 * window.Width / 12, 4 * window.Height / 12),
+                        Color.DarkRed);
 
                     // Draw all the buttons
                     foreach (Button button in buttons[4])

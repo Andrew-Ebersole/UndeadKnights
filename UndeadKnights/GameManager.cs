@@ -144,7 +144,8 @@ namespace UndeadKnights
         /// <param name="sb"></param>
         public void Draw(SpriteBatch sb)
         {
-            if (MenuUI.Get.GameFSM == GameState.Game)
+            if (MenuUI.Get.GameFSM == GameState.Game
+                || MenuUI.Get.GameFSM == GameState.GameOver)
             {
                 // Draw subclasses
                 TileManager.Get.Draw(sb);

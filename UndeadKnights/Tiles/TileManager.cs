@@ -13,7 +13,7 @@ using System.IO;
 // ---------------------------------------------------------------- //
 // Collaborators | Andrew Ebersole
 // Created Date  | 7-26-23
-// Last Update   | 7-29-23
+// Last Update   | 7-31-23
 // Purpose       | Manages all the tiles and upgrades them when needed
 // ---------------------------------------------------------------- //
 
@@ -28,6 +28,7 @@ namespace UndeadKnights.Tiles
         TownHall,
         House,
         Farm,
+        FarmFull,
         Wall,
         Gate,
         Turret,
@@ -100,6 +101,75 @@ namespace UndeadKnights.Tiles
                 for (int j = 0; j < 51; j++)
                 {
                     tileGrid[i, j].Update(gt, new Point(i, j));
+                    
+                    // Check when tile is clicked
+                    if (tileGrid[i, j].IsPressed)
+                    {
+                        switch (tileGrid[i, j].TileType)
+                        {
+                            case TileType.Grass:
+                                tileGrid[i, j] = new Building(TileType.Farm,buildingSpriteSheet,10,1);
+                                break;
+
+                            case TileType.Path:
+                                break;
+
+                            case TileType.Tree:
+                                tileGrid[i, j] = new Tile(TileType.Grass, environmentSpriteSheet);
+                                GameManager.Get.Wood += 1;
+                                break;
+
+                            case TileType.Rock:
+                                tileGrid[i, j] = new Tile(TileType.Grass, environmentSpriteSheet);
+                                GameManager.Get.Stone += 1;
+                                break;
+
+                            case TileType.TownHall:
+                                break;
+
+                            case TileType.House:
+                                break;
+
+                            case TileType.Farm:
+                                break;
+
+                            case TileType.FarmFull:
+                                tileGrid[i, j] = new Building(TileType.Farm, buildingSpriteSheet,10,1);
+                                GameManager.Get.Food += 1;
+                                break;
+
+                            case TileType.Armory:
+                                break;
+
+                            case TileType.ShootingRange:
+                                break;
+
+                            case TileType.Stable:
+                                break;
+
+                            case TileType.Wall:
+                                break;
+
+                            case TileType.Gate:
+                                break;
+
+                            case TileType.Turret:
+                                break;
+
+                        }
+                    }
+
+                    // Grow farm
+                    if (tileGrid[i,j].TileType == TileType.Farm)
+                    {
+                        // If the farm has been around for 30 seconds it will grow into farm full
+                        Building newbuilding = (Building)tileGrid[i,j];
+                        if (newbuilding.Timer > 30000)
+                        {
+                            tileGrid[i, j] = new Building
+                                (TileType.FarmFull,buildingSpriteSheet,10,newbuilding.Level);
+                        }
+                    }
                 }
             }
         }
@@ -114,7 +184,7 @@ namespace UndeadKnights.Tiles
             {
                 for (int j = 0; j < 51; j++)
                 {
-                    tileGrid[i, j].Draw(sb);
+                    tileGrid[i, j].Draw(sb, new Point(i,j));
                 }
             }
         }
