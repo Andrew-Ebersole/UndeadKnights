@@ -40,8 +40,11 @@ namespace UndeadKnights
         // inputs
         private KeyboardState currentKS;
         private KeyboardState previousKS;
-        
+
         // resources 
+        private int wood;
+        private int stone;
+        private int food;
 
         // Singleton
         private static GameManager instance = null;
@@ -67,6 +70,11 @@ namespace UndeadKnights
         public int TileSize { get { return tileSize; } }
 
         public Point Camera { get { return camera; } }
+
+        public int Wood { get { return wood; } set {  wood = value; } }
+        public int Stone { get {  return stone; } set {  stone = value; } }
+        public int Food { get { return food; } set {  food = value; } }
+
         // --- Constructor --- //
 
         public void Initialize(ContentManager content,
@@ -76,6 +84,10 @@ namespace UndeadKnights
 
             currentKS = Keyboard.GetState();
             previousKS = Keyboard.GetState();
+
+            wood = 10;
+            stone = 10;
+            food = 10;
 
             TileManager.Get.Initialize(content, windowsize, gd);
         }
@@ -134,6 +146,20 @@ namespace UndeadKnights
                 // Draw subclasses
                 TileManager.Get.Draw(sb);
 
+                // Display People
+                sb.DrawString(vinque24,
+                    "People: 0",
+                    new Vector2(10, 10),
+                    Color.White);
+
+                // Display Resources
+                sb.DrawString(vinque24,
+                    $"Wood: {wood}" +
+                    $"\nStone: {stone}" +
+                    $"\nFood: {food}",
+                    new Vector2(10,55),
+                    Color.White);
+                
                 // Timer
                 sb.DrawString(vinque24,
                     $"{Math.Round(Math.Floor(playTime/60000))}:{Math.Round((playTime/1000)%60):00}",

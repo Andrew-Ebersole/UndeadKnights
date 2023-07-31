@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Xna.Framework.Input;
 
 // ---------------------------------------------------------------- //
 // Collaborators | Andrew Ebersole
@@ -22,6 +23,8 @@ namespace UndeadKnights.Tiles
         protected Texture2D texture;
         protected Point spriteLocation;
         protected TileType tileType;
+        protected MouseState currentMState;
+        protected MouseState previousMState;
 
 
         // --- Properties --- //
@@ -52,6 +55,10 @@ namespace UndeadKnights.Tiles
                     this.spriteLocation = new Point(1,1);
                     break;
             }
+
+            // Mouse States
+            currentMState = new MouseState();
+            previousMState = new MouseState();
         }
 
 
@@ -64,7 +71,7 @@ namespace UndeadKnights.Tiles
         /// <param name="gt"></param>
         public void Update(GameTime gt)
         {
-
+            
         }
 
         /// <summary>
