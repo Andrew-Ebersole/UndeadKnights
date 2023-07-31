@@ -12,7 +12,7 @@ using UndeadKnights.Tiles;
 // ---------------------------------------------------------------- //
 // Collaborators | Andrew Ebersole
 // Created Date  | 7-26-23
-// Last Update   | 7-29-23
+// Last Update   | 7-30-23
 // Purpose       | Controls the menu of the game
 // ---------------------------------------------------------------- //
 
@@ -295,12 +295,6 @@ namespace UndeadKnights
                 gd,         // Graphics Device
                 vinque48)); // Font
 
-            // For testing delete later
-            buttons[3].Add(new Button(new Rectangle(12 * window.Width / 24-5, 12 * window.Height / 24-5,   // X,Y
-                10,10),                                      // Width,Height
-                "",     // Text
-                gd,         // Graphics Device
-                vinque48)); // Font
         }
 
     }

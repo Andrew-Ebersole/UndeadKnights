@@ -15,7 +15,7 @@ using Microsoft.Xna.Framework.Input;
 // ---------------------------------------------------------------- //
 // Collaborators | Andrew Ebersole
 // Created Date  | 7-26-23
-// Last Update   | 7-29-23
+// Last Update   | 7-30-23
 // Purpose       | Manages all the content in the game, updates all
 //               | The players, monsters, and tiles
 // ---------------------------------------------------------------- //
@@ -26,15 +26,23 @@ namespace UndeadKnights
     {
         // --- Fields --- //
 
+        //
         private Point camera;
         private int tileSize;
+
+        // stats
         private double playTime;
         private int nights;
+
+        // fonts
         private SpriteFont vinque24;
-        private Rectangle mapSize;
+
+        // inputs
         private KeyboardState currentKS;
         private KeyboardState previousKS;
         
+        // resources 
+
         // Singleton
         private static GameManager instance = null;
 
@@ -86,8 +94,14 @@ namespace UndeadKnights
                 currentKS = Keyboard.GetState();
 
                 // Zoom controls
-                if (tileSize < 200 && SingleKeyPress(Keys.Up)) { tileSize += 25;}
-                if (tileSize > 50 && SingleKeyPress(Keys.Down)) { tileSize -= 25;}
+                if (tileSize < 100 && SingleKeyPress(Keys.Up)) {
+                    camera.X += (int)(1920/(3*Math.Pow(2,(tileSize/25))));
+                    camera.Y += (int)(1080 / (3 * Math.Pow(2, (tileSize / 25))));
+                    tileSize += 25; }
+                if (tileSize > 50 && SingleKeyPress(Keys.Down)) { tileSize -= 25;
+                    camera.X -= (int)(1920 / (3 * Math.Pow(2, (tileSize / 25))));
+                    camera.Y -= (int)(1080 / (3 * Math.Pow(2, (tileSize / 25))));
+                }
 
                 // Move camera controls
                 if (currentKS.IsKeyDown(Keys.A)) { camera.X-=5; }
@@ -102,6 +116,9 @@ namespace UndeadKnights
                 if (camera.X > 1275-1920/(tileSize/25)) { camera.X = 1275 - 1920 / (tileSize / 25); }
                 if (camera.Y > 1275-1080/(tileSize/25)) { camera.Y = 1275 - 1080 / (tileSize / 25); }
 
+                // update timer
+                playTime += gt.ElapsedGameTime.Milliseconds;
+
                 previousKS = currentKS;
             }
         }
@@ -114,12 +131,18 @@ namespace UndeadKnights
         {
             if (MenuUI.Get.GameFSM == GameState.Game)
             {
+                // Draw subclasses
                 TileManager.Get.Draw(sb);
-            }
 
-            // Draw Camera Position
-            sb.DrawString(vinque24,$"({Camera.X},{Camera.Y}) : {tileSize} ",
-                new Vector2(10,10),Color.White);
+                // Timer
+                sb.DrawString(vinque24,
+                    $"{Math.Round(Math.Floor(playTime/60000))}:{Math.Round((playTime/1000)%60):00}",
+                    new Vector2(1800,10),
+                    Color.White);
+
+                // Draw Camera Position
+                //sb.DrawString(vinque24,$"({Camera.X},{Camera.Y}) : {tileSize} ", new Vector2(10,10),Color.White);
+            }
         }
 
         /// <summary>

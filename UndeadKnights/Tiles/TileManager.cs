@@ -160,7 +160,7 @@ namespace UndeadKnights.Tiles
                     // Move toward X a random amount of times
                     if (start.X < end.X)
                     {
-                        for (int i = 0; i < rng.Next(2, 5); i++)
+                        for (int i = 0; i < rng.Next(1, Math.Abs((int)Math.Pow((start.X - end.X), 2) / 4)+1); i++)
                         {
                             if (start.X > 0 && start.X < 50)
                             {
@@ -171,7 +171,7 @@ namespace UndeadKnights.Tiles
                     }
                     else
                     {
-                        for (int i = 0; i < rng.Next(2, 5); i++)
+                        for (int i = 0; i < rng.Next(1, Math.Abs((int)Math.Pow((start.X - end.X), 2) / 4)+1); i++)
                         {
                             if (start.X > 0 && start.X < 50)
                             {
@@ -185,7 +185,7 @@ namespace UndeadKnights.Tiles
                     // Move toward end in Y direction a random amount of times
                     if (start.Y < end.Y)
                     {
-                        for (int i = 0; i < rng.Next(2, 5); i++)
+                        for (int i = 0; i < rng.Next(1, Math.Abs((int)Math.Pow((start.Y - end.Y), 2) / 4)+1); i++)
                         {
                             if (start.Y > 0 && start.Y < 50)
                             {
@@ -195,7 +195,7 @@ namespace UndeadKnights.Tiles
                         }
                     } else
                     {
-                        for (int i = 0; i < rng.Next(3, 5); i++)
+                        for (int i = 0; i < rng.Next(1, Math.Abs((int)Math.Pow((start.Y - end.Y), 2) / 4)+1); i++)
                         {
                             if (start.Y > 0 && start.Y < 50)
                             {
@@ -333,7 +333,9 @@ namespace UndeadKnights.Tiles
             if (x >= 0 && y >= 0
                 && x <51 && y < 51)
             {
-                if (tileGrid[x, y].TileType == TileType.Path)
+                if (tileGrid[x, y].TileType != TileType.Grass
+                    && tileGrid[x,y].TileType != TileType.Tree
+                    && tileGrid[x,y].TileType != TileType.Rock)
                 {
                     return true;
                 }

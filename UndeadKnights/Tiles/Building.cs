@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 // ---------------------------------------------------------------- //
 // Collaborators | Andrew Ebersole
 // Created Date  | 7-29-23
-// Last Update   | 7-29-23
+// Last Update   | 7-30-23
 // Purpose       | Tiles that have health and can be destroyed
 // ---------------------------------------------------------------- //
 
@@ -18,14 +18,23 @@ namespace UndeadKnights.Tiles
     internal class Building : Tile
     {
         // --- Fields --- //
+
         private int health;
         private int level;
+        private int people;
+        private int maxPeople;
         
 
 
         // --- Properties --- //
 
+        public int Health { get { return health; } }
 
+        public int Level { get { return level; } }
+
+        public int People { get { return people; } }
+
+        public int MaxPeople { get { return maxPeople; } }
 
 
 
@@ -63,5 +72,11 @@ namespace UndeadKnights.Tiles
 
 
         // --- Methods --- //
+
+
+
+
+
+
     }
 }
