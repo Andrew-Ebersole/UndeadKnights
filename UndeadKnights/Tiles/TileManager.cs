@@ -9,6 +9,7 @@ using System.ComponentModel;
 using Microsoft.Xna.Framework.Content;
 using System.Security.Cryptography;
 using System.IO;
+using Microsoft.Xna.Framework.Input;
 
 // ---------------------------------------------------------------- //
 // Collaborators | Andrew Ebersole
@@ -48,6 +49,21 @@ namespace UndeadKnights.Tiles
         private Texture2D buildingSpriteSheet;
         private Random rng;
 
+        // Buttons
+        private List<Button> buttons;
+        private List<Button> usedButtons;
+
+        // Upgraded tile
+        private Tile upgradedTile;
+
+        // Fonts
+        private SpriteFont vinque24;
+
+        // Mouse State
+        private MouseState currentMS;
+        private MouseState previousMS;
+
+
         //Singleton
 
         public static TileManager instance = null;
@@ -83,7 +99,19 @@ namespace UndeadKnights.Tiles
             // Create randomifier
             rng = new Random();
 
+            vinque24 = content.Load<SpriteFont>("vinque-24");
+
+            // Generate map
             NewMap();
+
+            // Generate buttons
+            GenerateButtons(gd);
+
+            // Mouse state 
+            currentMS = Mouse.GetState();
+            previousMS = Mouse.GetState();
+
+            usedButtons = new List<Button>();
         }
 
 
@@ -96,6 +124,35 @@ namespace UndeadKnights.Tiles
         /// <param name="gt"></param>
         public void Update(GameTime gt)
         {
+            currentMS = Mouse.GetState();
+
+
+            // Update Buttons
+            // If they clicked off delete ui buttons
+            // This should remain above the updating of tiles
+            bool clickedOff = false;
+            if (currentMS.LeftButton == ButtonState.Pressed
+                && previousMS.LeftButton == ButtonState.Released
+                && usedButtons.Count > 0)
+            {
+                clickedOff = true;
+            }
+            foreach (Button b in usedButtons)
+            {
+                b.Update(gt);
+                if (b.IsPressed)
+                {
+                    clickedOff = false;
+                    System.Diagnostics.Debug.WriteLine(b.IsPressed);
+                }
+            }
+            if (clickedOff)
+            {
+                usedButtons.Clear();
+            }
+
+
+            // Update all tiles
             for (int i = 0; i < 51; i++)
             {
                 for (int j = 0; j < 51; j++)
@@ -103,15 +160,20 @@ namespace UndeadKnights.Tiles
                     tileGrid[i, j].Update(gt, new Point(i, j));
                     
                     // Check when tile is clicked
-                    if (tileGrid[i, j].IsPressed)
+                    if (tileGrid[i, j].IsPressed
+                        && usedButtons.Count == 0
+                        && !clickedOff)
                     {
                         switch (tileGrid[i, j].TileType)
                         {
                             case TileType.Grass:
-                                tileGrid[i, j] = new Building(TileType.Farm,buildingSpriteSheet,10,1);
+                                UpgradeOptions(tileGrid[i, j], new List<TileType>() {
+                                    TileType.Farm, TileType.House, TileType.Armory, TileType.Wall});
                                 break;
 
                             case TileType.Path:
+                                UpgradeOptions(tileGrid[i, j], new List<TileType>() {
+                                    TileType.Gate});
                                 break;
 
                             case TileType.Tree:
@@ -124,13 +186,8 @@ namespace UndeadKnights.Tiles
                                 GameManager.Get.Stone += 1;
                                 break;
 
-                            case TileType.TownHall:
-                                break;
-
                             case TileType.House:
-                                break;
-
-                            case TileType.Farm:
+                                UpgradeOptions(tileGrid[i, j], new List<TileType>() {});
                                 break;
 
                             case TileType.FarmFull:
@@ -139,21 +196,17 @@ namespace UndeadKnights.Tiles
                                 break;
 
                             case TileType.Armory:
-                                break;
-
-                            case TileType.ShootingRange:
-                                break;
-
-                            case TileType.Stable:
+                                UpgradeOptions(tileGrid[i, j], new List<TileType>() {
+                                    TileType.ShootingRange, TileType.Stable});
                                 break;
 
                             case TileType.Wall:
+                                UpgradeOptions(tileGrid[i, j], new List<TileType>() {
+                                    TileType.Gate,TileType.Turret });
                                 break;
 
-                            case TileType.Gate:
-                                break;
-
-                            case TileType.Turret:
+                            default:
+                                UpgradeOptions(tileGrid[i, j], new List<TileType>(){ });
                                 break;
 
                         }
@@ -172,6 +225,12 @@ namespace UndeadKnights.Tiles
                     }
                 }
             }
+
+            
+
+            // This should remain at end of update
+            previousMS = currentMS;
+
         }
 
         /// <summary>
@@ -187,9 +246,17 @@ namespace UndeadKnights.Tiles
                     tileGrid[i, j].Draw(sb, new Point(i,j));
                 }
             }
+
+            // draw UI buttons
+            foreach (Button b in usedButtons)
+            {
+                b.Draw(sb);
+            }
         }
 
-
+        /// <summary>
+        /// Creates a new map with paths and trees and stuff
+        /// </summary>
         public void NewMap()
         {
             // Set all to grass
@@ -211,7 +278,7 @@ namespace UndeadKnights.Tiles
         /// <summary>
         /// Generates the path that the enemies will come from
         /// </summary>
-        public void GeneratePath()
+        private void GeneratePath()
         {
             FillPath(new Point(25,25),new Point(0,rng.Next(0,51)));
             FillPath(new Point(25, 25), new Point(rng.Next(0, 51), 50));
@@ -225,7 +292,7 @@ namespace UndeadKnights.Tiles
         /// </summary>
         /// <param name="start"></param>
         /// <param name="end"></param>
-        public void FillPath(Point start, Point end)
+        private void FillPath(Point start, Point end)
         {
             if (tileGrid[end.X,end.Y].TileType != TileType.Path)
             {
@@ -291,7 +358,7 @@ namespace UndeadKnights.Tiles
         /// Replaces grass with other resources
         /// </summary>
         /// <param name="GrassPercentLeft"> Percent of tiles that will remain grass</param>
-        public void FillGrass(int GrassPercentLeft)
+        private void FillGrass(int GrassPercentLeft)
         {
             // Loop for every tile
             for (int x = 0; x < 51; x++)
@@ -335,7 +402,7 @@ namespace UndeadKnights.Tiles
         /// <param name="startingX"></param>
         /// <param name="startingY"></param>
         /// <returns></returns>
-        public int NearestPath(int startingX, int startingY)
+        private int NearestPath(int startingX, int startingY)
         {
             int distance = 0;
 
@@ -404,7 +471,7 @@ namespace UndeadKnights.Tiles
         /// <param name="x"></param>
         /// <param name="y"></param>
         /// <returns></returns>
-        public bool IsPath(int x, int y)
+        private bool IsPath(int x, int y)
         {
             if (x >= 0 && y >= 0
                 && x <51 && y < 51)
@@ -417,6 +484,114 @@ namespace UndeadKnights.Tiles
                 }
             }
             return false;
+        }
+
+        /// <summary>
+        /// Creates the UI menu that displays different upgrade options
+        /// </summary>
+        /// <param name="clickedTile"> The tile that is being upgraded</param>
+        /// <param name="tileTypes"> The different types of tiles that it can be turned into </param>
+        private void UpgradeOptions(Tile clickedTile, List<TileType> tileTypes)
+        {
+            upgradedTile = clickedTile;
+            usedButtons.Clear();
+            usedButtons.Add(buttons[0]);
+
+            // Add the buttons that are requested
+            foreach (TileType t in tileTypes)
+            {
+                switch (t)
+                {
+                    case TileType.House:
+                        usedButtons.Add(buttons[1]);
+                        break;
+                    case TileType.Farm:
+                        usedButtons.Add(buttons[2]);
+                        break;
+                    case TileType.Armory:
+                        usedButtons.Add(buttons[3]);
+                        break;
+                    case TileType.ShootingRange:
+                        usedButtons.Add(buttons[4]);
+                        break;
+                    case TileType.Stable:
+                        usedButtons.Add(buttons[5]);
+                        break;
+                    case TileType.Wall:
+                        usedButtons.Add(buttons[6]);
+                        break;
+                    case TileType.Gate:
+                        usedButtons.Add(buttons[7]);
+                        break;
+                    case TileType.Turret:
+                        usedButtons.Add(buttons[8]);
+                        break;
+                }
+
+                // If the clicked tile contains people add the add people buttons
+                if (clickedTile.TileType == TileType.House
+                    || clickedTile.TileType == TileType.Armory
+                    || clickedTile.TileType == TileType.ShootingRange
+                    || clickedTile.TileType == TileType.Stable)
+                {
+                    usedButtons.Add(buttons[9]);
+                }
+            }
+
+            // Moves the UI to the middle of screen
+            usedButtons[0].PositionRectangle = new Rectangle(960-tileTypes.Count*75-25, 440, 150 * tileTypes.Count + 50, 200);
+
+            for (int i = 1; i < usedButtons.Count; i++) 
+            {
+                usedButtons[i].PositionRectangle =
+                    new Rectangle(usedButtons[0].PositionRectangle.X + 25 + 150 * (i - 1),
+                    usedButtons[0].PositionRectangle.Y + 25, 150, 150);
+            }
+        }
+
+        private void GenerateButtons(GraphicsDevice gd)
+        {
+            buttons = new List<Button>();
+
+            // Background
+            buttons.Add(new Button(new Rectangle(-1000, -1000, 400, 200)
+                , "", gd, vinque24));
+
+            // Place house
+            buttons.Add(new Button(new Rectangle(-1000, -1000, 150, 150),
+                "House", gd, vinque24));
+
+            // Place Farm
+            buttons.Add(new Button(new Rectangle(-1000, -1000, 150, 150),
+                "Farm", gd, vinque24));
+
+            // Place Armory
+            buttons.Add(new Button(new Rectangle(-1000, -1000, 150, 150),
+                "Armory", gd, vinque24));
+
+            // Place Shooting Range
+            buttons.Add(new Button(new Rectangle(-1000, -1000, 150, 150),
+                "Archery", gd, vinque24));
+
+            // Place Stable
+            buttons.Add(new Button(new Rectangle(-1000, -1000, 150, 150),
+                "Stable", gd, vinque24));
+
+            // Place Wall
+            buttons.Add(new Button(new Rectangle(-1000, -1000, 150, 150),
+                "Wall", gd, vinque24));
+
+            // Place Gate
+            buttons.Add(new Button(new Rectangle(-1000, -1000, 150, 150),
+                "Gate", gd, vinque24));
+
+            // Place Turret
+            buttons.Add(new Button(new Rectangle(-1000, -1000, 150, 150),
+                "Turret", gd, vinque24));
+
+            // Add People
+            buttons.Add(new Button(new Rectangle(-1000, -1000, 100, 50),
+                "People", gd, vinque24));
         }
     }
 }

@@ -60,6 +60,11 @@ namespace UndeadKnights
         /// </summary>
         public string Text { get { return text; } set { text = value; } }
 
+        /// <summary>
+        /// Returns the rectangle of the button
+        /// </summary>
+        public Rectangle PositionRectangle { get { return rectangle; } set { rectangle = value; } }
+
         // --- Constructor --- //
 
         /// <summary>
