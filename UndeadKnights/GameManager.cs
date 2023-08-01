@@ -15,7 +15,7 @@ using Microsoft.Xna.Framework.Input;
 // ---------------------------------------------------------------- //
 // Collaborators | Andrew Ebersole
 // Created Date  | 7-26-23
-// Last Update   | 7-31-23
+// Last Update   | 8-1-23
 // Purpose       | Manages all the content in the game, updates all
 //               | The players, monsters, and tiles
 // ---------------------------------------------------------------- //
@@ -33,6 +33,7 @@ namespace UndeadKnights
         // stats
         private double playTime;
         private int nights;
+        private double fadeToNightTimer;
 
         // fonts
         private SpriteFont vinque24;
@@ -46,6 +47,8 @@ namespace UndeadKnights
         private int stone;
         private int food;
         private int people;
+
+        private Texture2D singlecolor;
 
         // Singleton
         private static GameManager instance = null;
@@ -88,6 +91,7 @@ namespace UndeadKnights
             currentKS = Keyboard.GetState();
             previousKS = Keyboard.GetState();
 
+            
             // Starting materials
             wood = 10;
             stone = 10;
@@ -95,6 +99,10 @@ namespace UndeadKnights
             people = 10;
 
             TileManager.Get.Initialize(content, windowsize, gd);
+
+            // Graphics
+            singlecolor = new Texture2D(gd, 1, 1);
+            singlecolor.SetData(new Color[] { Color.White });
         }
 
 
@@ -136,6 +144,27 @@ namespace UndeadKnights
                 // update timer
                 playTime += gt.ElapsedGameTime.Milliseconds;
 
+                // Update Fade to night timer
+
+                if (Math.Round(Math.Floor((playTime + 1000) / 60000)) % 2 == 1
+                    && fadeToNightTimer < 2000)
+                {
+                    // Dark screen when its night
+                    fadeToNightTimer += gt.ElapsedGameTime.Milliseconds;
+                    if (fadeToNightTimer > 2000)
+                    {
+                        fadeToNightTimer = 2000;
+                    }
+                } else if (fadeToNightTimer > 0)
+                {
+                    // Undarken screen when its day
+                    fadeToNightTimer -= gt.ElapsedGameTime.Milliseconds;
+                    if (fadeToNightTimer < 0)
+                    {
+                        fadeToNightTimer = 0;
+                    }
+                }
+
                 // update subclasses
                 TileManager.Get.Update(gt);
 
@@ -152,8 +181,13 @@ namespace UndeadKnights
             if (MenuUI.Get.GameFSM == GameState.Game
                 || MenuUI.Get.GameFSM == GameState.GameOver)
             {
+
                 // Draw subclasses
                 TileManager.Get.Draw(sb);
+
+                // Draw nighttime overlay
+                sb.Draw(singlecolor, new Rectangle(0, 0, 1920, 1080),
+                        Color.Black * (0.45f * (float)(fadeToNightTimer / 2000f)));
 
                 // Display People
                 sb.DrawString(vinque24,
@@ -171,7 +205,7 @@ namespace UndeadKnights
                 
                 // Timer
                 sb.DrawString(vinque24,
-                    $"{Math.Round(Math.Floor(playTime/60000))}:{Math.Round((playTime/1000)%60):00}",
+                    $"{Math.Round(Math.Floor(playTime/60000))}:{Math.Floor(((playTime/1000)%60)):00}",
                     new Vector2(1800,10),
                     Color.White);
 

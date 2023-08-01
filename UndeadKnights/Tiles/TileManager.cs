@@ -14,7 +14,7 @@ using Microsoft.Xna.Framework.Input;
 // ---------------------------------------------------------------- //
 // Collaborators | Andrew Ebersole
 // Created Date  | 7-26-23
-// Last Update   | 7-31-23
+// Last Update   | 8-1-23
 // Purpose       | Manages all the tiles and upgrades them when needed
 // ---------------------------------------------------------------- //
 
@@ -52,6 +52,7 @@ namespace UndeadKnights.Tiles
         // Buttons
         private List<Button> buttons;
         private List<Button> usedButtons;
+        private double clickDelayTimer;
 
         // Upgraded tile
         private Point upgradedTile;
@@ -113,6 +114,8 @@ namespace UndeadKnights.Tiles
             previousMS = Mouse.GetState();
 
             usedButtons = new List<Button>();
+
+
         }
 
 
@@ -155,7 +158,8 @@ namespace UndeadKnights.Tiles
                 // Build building if have enough resources
                 foreach (Button b in usedButtons)
                 {
-                    if (b.IsPressed)
+                    if (b.IsPressed
+                        && clickDelayTimer > 100)
                     {
                         clickedOff = true;
 
@@ -245,6 +249,10 @@ namespace UndeadKnights.Tiles
                         && usedButtons.Count == 0
                         && !clickedOff)
                     {
+                        // Reset click delay
+                        clickDelayTimer = 0;
+
+                        // Check what type of tile was clicked
                         switch (tileGrid[i, j].TileType)
                         {
                             case TileType.Grass:
@@ -269,11 +277,6 @@ namespace UndeadKnights.Tiles
                                 GameManager.Get.Stone += 1;
                                 break;
 
-                            case TileType.House:
-                                UpgradeOptions(tileGrid[i, j], new List<TileType>() { },
-                                    new Point(i, j));
-                                break;
-
                             case TileType.FarmFull:
                                 tileGrid[i, j] = new Building(TileType.Farm, buildingSpriteSheet, 10, 1);
                                 GameManager.Get.Food += 1;
@@ -288,11 +291,6 @@ namespace UndeadKnights.Tiles
                             case TileType.Wall:
                                 UpgradeOptions(tileGrid[i, j], new List<TileType>() {
                                     TileType.Gate,TileType.Turret },
-                                    new Point(i, j));
-                                break;
-
-                            default:
-                                UpgradeOptions(tileGrid[i, j], new List<TileType>() { },
                                     new Point(i, j));
                                 break;
 
@@ -313,7 +311,8 @@ namespace UndeadKnights.Tiles
                 }
             }
 
-
+            // Update the timer
+            clickDelayTimer += gt.ElapsedGameTime.Milliseconds;
 
             // This should remain at end of update
             previousMS = currentMS;
