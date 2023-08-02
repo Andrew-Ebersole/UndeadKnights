@@ -47,6 +47,7 @@ namespace UndeadKnights.Tiles
         private Tile[,] tileGrid;
         private Texture2D environmentSpriteSheet;
         private Texture2D buildingSpriteSheet;
+        private Texture2D wallSpriteSheet;
         private Random rng;
 
         // Buttons
@@ -98,6 +99,8 @@ namespace UndeadKnights.Tiles
 
             environmentSpriteSheet = content.Load<Texture2D>("EnvironmentSpriteSheet");
             buildingSpriteSheet = content.Load<Texture2D>("Buildings");
+            wallSpriteSheet = content.Load<Texture2D>("wall");
+
             // Create randomifier
             rng = new Random();
 
@@ -201,7 +204,7 @@ namespace UndeadKnights.Tiles
                         // Wall 
                         if (b == buttons[6] && GameManager.Get.Wood >= 1)
                         {
-                            tileGrid[upgradedTile.X, upgradedTile.Y] = new Building(TileType.Wall, buildingSpriteSheet, 75, 1);
+                            tileGrid[upgradedTile.X, upgradedTile.Y] = new Wall(TileType.Wall, wallSpriteSheet, 1);
                             GameManager.Get.Wood -= 1;
                         }
 
