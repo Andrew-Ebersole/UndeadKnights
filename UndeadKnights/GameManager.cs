@@ -162,7 +162,7 @@ namespace UndeadKnights
                     if (fadeToNightTimer == 2000)
                     {
                         nights++;
-                        TileManager.Get.FillGrass(90);
+                        TileManager.Get.FillGrass(95);
                     }
                     // Undarken screen when its day
                     fadeToNightTimer -= gt.ElapsedGameTime.Milliseconds;
@@ -213,7 +213,13 @@ namespace UndeadKnights
                 // Timer
                 sb.DrawString(vinque24,
                     $"{Math.Round(Math.Floor(playTime/60000))}:{Math.Floor(((playTime/1000)%60)):00}",
-                    new Vector2(1800,10),
+                    new Vector2(1700,50),
+                    Color.White);
+
+                // Nights Survived
+                sb.DrawString(vinque24,
+                    $"Nights: {nights}",
+                    new Vector2(1700, 10),
                     Color.White);
 
                 // Draw Camera Position
