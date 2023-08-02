@@ -147,7 +147,7 @@ namespace UndeadKnights
                 // Update Fade to night timer
 
                 if (Math.Round(Math.Floor((playTime + 1000) / 60000)) % 2 == 1
-                    && fadeToNightTimer < 2000)
+                    && fadeToNightTimer <= 2000)
                 {
                     // Dark screen when its night
                     fadeToNightTimer += gt.ElapsedGameTime.Milliseconds;
@@ -157,6 +157,13 @@ namespace UndeadKnights
                     }
                 } else if (fadeToNightTimer > 0)
                 {
+                    // Add +1 to the nights survived
+                    // Refill grass with new trees and rocks
+                    if (fadeToNightTimer == 2000)
+                    {
+                        nights++;
+                        TileManager.Get.FillGrass(90);
+                    }
                     // Undarken screen when its day
                     fadeToNightTimer -= gt.ElapsedGameTime.Milliseconds;
                     if (fadeToNightTimer < 0)

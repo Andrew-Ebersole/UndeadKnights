@@ -453,7 +453,7 @@ namespace UndeadKnights.Tiles
         /// Replaces grass with other resources
         /// </summary>
         /// <param name="GrassPercentLeft"> Percent of tiles that will remain grass</param>
-        private void FillGrass(int GrassPercentLeft)
+        public void FillGrass(int GrassPercentLeft)
         {
             // Loop for every tile
             for (int x = 0; x < 51; x++)
