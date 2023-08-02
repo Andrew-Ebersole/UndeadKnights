@@ -112,7 +112,6 @@ namespace UndeadKnights
                     if (buttons[0][0].IsPressed) 
                     { 
                         gameFSM = GameState.Game;
-                        GameManager.Get.PlayTime = 0;
                         GameManager.Get.NewGame();
                     }
                     if (buttons[0][1].IsPressed) { gameFSM = GameState.Settings; }

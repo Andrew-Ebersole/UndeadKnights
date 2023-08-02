@@ -144,7 +144,8 @@ namespace UndeadKnights.Tiles
             bool clickedOff = false;
             if (currentMS.LeftButton == ButtonState.Pressed
                 && previousMS.LeftButton == ButtonState.Released
-                && usedButtons.Count > 0)
+                && usedButtons.Count > 0
+                && clickDelayTimer > 100)
             {
                 clickedOff = true;
             }

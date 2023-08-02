@@ -247,6 +247,8 @@ namespace UndeadKnights
             TileManager.Get.NewMap();
             tileSize = 50;
             camera = new Point(155, 370);
+            playTime = 0;
+            fadeToNightTimer = 0;
         }
     }
 }
