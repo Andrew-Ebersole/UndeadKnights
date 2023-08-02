@@ -163,19 +163,20 @@ namespace UndeadKnights.Tiles
             }
             else
             {
+
                 // Build building if have enough resources
                 foreach (Button b in usedButtons)
                 {
                     if (b.IsPressed
                         && clickDelayTimer > 100)
                     {
-                        clickedOff = true;
 
                         // House
                         if (b == buttons[1] && GameManager.Get.Wood >= 2)
                         {
                             tileGrid[upgradedTile.X, upgradedTile.Y] = new Building(TileType.House, buildingSpriteSheet, 1);
                             GameManager.Get.Wood -= 2;
+                            clickedOff = true;
                         }
 
                         // Farm
@@ -183,6 +184,7 @@ namespace UndeadKnights.Tiles
                         {
                             tileGrid[upgradedTile.X, upgradedTile.Y] = new Building(TileType.Farm, buildingSpriteSheet, 1);
                             GameManager.Get.People -= 1;
+                            clickedOff = true;
                         }
 
                         // Armory
@@ -190,6 +192,7 @@ namespace UndeadKnights.Tiles
                         {
                             tileGrid[upgradedTile.X, upgradedTile.Y] = new Building(TileType.Armory, buildingSpriteSheet, 1);
                             GameManager.Get.Stone -= 3;
+                            clickedOff = true;
                         }
 
                         // Archery
@@ -197,6 +200,7 @@ namespace UndeadKnights.Tiles
                         {
                             tileGrid[upgradedTile.X, upgradedTile.Y] = new Building(TileType.ShootingRange, buildingSpriteSheet, 1);
                             GameManager.Get.Wood -= 3;
+                            clickedOff = true;
                         }
 
                         // Stable
@@ -204,6 +208,7 @@ namespace UndeadKnights.Tiles
                         {
                             tileGrid[upgradedTile.X, upgradedTile.Y] = new Building(TileType.Stable, buildingSpriteSheet, 1);
                             GameManager.Get.Wood -= 5;
+                            clickedOff = true;
                         }
 
                         // Wall 
@@ -211,6 +216,7 @@ namespace UndeadKnights.Tiles
                         {
                             tileGrid[upgradedTile.X, upgradedTile.Y] = new Wall(TileType.Wall, wallSpriteSheet, 1);
                             GameManager.Get.Wood -= 1;
+                            clickedOff = true;
                         }
 
                         // Gate
@@ -227,6 +233,7 @@ namespace UndeadKnights.Tiles
                                 tileGrid[upgradedTile.X, upgradedTile.Y] = new Wall(TileType.Gate, gateSpriteSheet, 1);
                             }
                             GameManager.Get.Wood -= 2;
+                            clickedOff = true;
                         }
 
                         // Turret
@@ -234,13 +241,21 @@ namespace UndeadKnights.Tiles
                         {
                             tileGrid[upgradedTile.X, upgradedTile.Y] = new Wall(TileType.Turret, turretSpriteSheet, 1);
                             GameManager.Get.People -= 1;
+                            clickedOff = true;
                         }
 
                         // People
-                        if (b == buttons[2] && GameManager.Get.Food >= 1)
+                        if (b == buttons[9] && GameManager.Get.Food >= 1)
                         {
-                            GameManager.Get.Food -= 1;
-                            GameManager.Get.People += 1;
+                            Building newBuilding = (Building)tileGrid[upgradedTile.X, upgradedTile.Y];
+                            if (newBuilding.People < newBuilding.MaxPeople)
+                            {
+                                GameManager.Get.Food -= 1;
+                                GameManager.Get.People += 1;
+                                newBuilding.People += 1;
+                                clickedOff = true;
+                                buttons[9].Text = $"People\n\n1 food\n({newBuilding.People}/{newBuilding.MaxPeople})";
+                            }
                         }
 
                     }
@@ -303,21 +318,33 @@ namespace UndeadKnights.Tiles
                                 UpgradeOptions(tileGrid[i, j], new List<TileType>() {
                                     TileType.ShootingRange, TileType.Stable},
                                     new Point(i, j));
+
+                                // Update people text
+                                UpdatePeopleText(tileGrid[i, j]);
                                 break;
 
                             case TileType.ShootingRange:
                                 UpgradeOptions(tileGrid[i, j], new List<TileType>() {},
                                     new Point(i, j));
+
+                                // Update people text
+                                UpdatePeopleText(tileGrid[i, j]);
                                 break;
 
                             case TileType.Stable:
                                 UpgradeOptions(tileGrid[i, j], new List<TileType>() {},
                                     new Point(i, j));
+
+                                // Update people text
+                                UpdatePeopleText(tileGrid[i, j]);
                                 break;
 
                             case TileType.House:
                                 UpgradeOptions(tileGrid[i, j], new List<TileType>() {},
                                     new Point(i, j));
+
+                                // Update people text
+                                UpdatePeopleText(tileGrid[i, j]);
                                 break;
 
                             case TileType.Wall:
@@ -382,12 +409,15 @@ namespace UndeadKnights.Tiles
                 }
             }
 
+
             // draw UI buttons
             foreach (Button b in usedButtons)
             {
                 b.Draw(sb);
             }
         }
+
+        #region Map Generation
 
         /// <summary>
         /// Creates a new map with paths and trees and stuff
@@ -420,7 +450,7 @@ namespace UndeadKnights.Tiles
             FillPath(new Point(25, 25), new Point(rng.Next(0, 51), 50));
             FillPath(new Point(25, 25), new Point(50, rng.Next(0, 51)));
 
-            FillGrass(0);
+            FillGrass(20);
         }
 
         /// <summary>
@@ -623,7 +653,9 @@ namespace UndeadKnights.Tiles
             }
             return false;
         }
+        #endregion
 
+        #region UI buttons
         /// <summary>
         /// Creates the UI menu that displays different upgrade options
         /// </summary>
@@ -699,39 +731,53 @@ namespace UndeadKnights.Tiles
 
             // Place house
             buttons.Add(new Button(new Rectangle(-1000, -1000, 150, 150),
-                "House", gd, vinque24));
+                "House \n\n2 wood", gd, vinque24));
 
             // Place Farm
             buttons.Add(new Button(new Rectangle(-1000, -1000, 150, 150),
-                "Farm", gd, vinque24));
+                "Farm \n\n1 person", gd, vinque24));
 
             // Place Armory
             buttons.Add(new Button(new Rectangle(-1000, -1000, 150, 150),
-                "Armory", gd, vinque24));
+                "Armory \n\n3 stone", gd, vinque24));
 
             // Place Shooting Range
             buttons.Add(new Button(new Rectangle(-1000, -1000, 150, 150),
-                "Archery", gd, vinque24));
+                "Archery \n\n3 wood", gd, vinque24));
 
             // Place Stable
             buttons.Add(new Button(new Rectangle(-1000, -1000, 150, 150),
-                "Stable", gd, vinque24));
+                "Stable \n\n5 wood", gd, vinque24));
 
             // Place Wall
             buttons.Add(new Button(new Rectangle(-1000, -1000, 150, 150),
-                "Wall", gd, vinque24));
+                "Wall \n\n1 wood", gd, vinque24));
 
             // Place Gate
             buttons.Add(new Button(new Rectangle(-1000, -1000, 150, 150),
-                "Gate", gd, vinque24));
+                "Gate \n\n2 wood", gd, vinque24));
 
             // Place Turret
             buttons.Add(new Button(new Rectangle(-1000, -1000, 150, 150),
-                "Turret", gd, vinque24));
+                "Turret \n\n1 person", gd, vinque24));
 
             // Add People
             buttons.Add(new Button(new Rectangle(-1000, -1000, 150, 150),
-                "People", gd, vinque24));
+                "People \n\n1 food", gd, vinque24));
+        }
+
+        #endregion
+
+        /// <summary>
+        /// Updates the text displaying amount of people to
+        /// the amount of people in given tile
+        /// </summary>
+        /// <param name="tile"></param>
+        private void UpdatePeopleText(Tile tile)
+        {
+            Building tileToUpgrade = (Building)tile;
+            buttons[9].Text = $"People\n\nFood 1\n" +
+                $"({tileToUpgrade.People}/{tileToUpgrade.MaxPeople})";
         }
     }
 }

@@ -33,7 +33,7 @@ namespace UndeadKnights.Tiles
 
         public int Level { get { return level; } }
 
-        public int People { get { return people; } }
+        public int People { get { return people; } set { people = value; } }
 
         public int MaxPeople { get { return maxPeople; } }
 
@@ -46,6 +46,7 @@ namespace UndeadKnights.Tiles
         {
             this.level = level;
             timer = 0;
+            people = 0;
 
             switch (tileType)
             {

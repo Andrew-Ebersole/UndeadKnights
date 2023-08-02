@@ -57,6 +57,7 @@ namespace UndeadKnights.Tiles
         /// </summary>
         public bool OnPath { get { return onPath; } set { onPath = value; } }
 
+
         // --- Constructor --- //
         
         public Tile(TileType tileType, Texture2D texture)

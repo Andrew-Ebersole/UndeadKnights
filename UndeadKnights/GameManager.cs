@@ -96,7 +96,6 @@ namespace UndeadKnights
             wood = 10;
             stone = 10;
             food = 10;
-            people = 10;
 
             TileManager.Get.Initialize(content, windowsize, gd);
 
@@ -198,7 +197,7 @@ namespace UndeadKnights
 
                 // Display People
                 sb.DrawString(vinque24,
-                    "People: 0",
+                    $"People: {people}",
                     new Vector2(10, 10),
                     Color.White);
 
