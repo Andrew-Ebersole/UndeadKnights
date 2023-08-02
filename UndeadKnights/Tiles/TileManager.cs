@@ -174,35 +174,35 @@ namespace UndeadKnights.Tiles
                         // House
                         if (b == buttons[1] && GameManager.Get.Wood >= 2)
                         {
-                            tileGrid[upgradedTile.X, upgradedTile.Y] = new Building(TileType.House, buildingSpriteSheet, 50, 1);
+                            tileGrid[upgradedTile.X, upgradedTile.Y] = new Building(TileType.House, buildingSpriteSheet, 1);
                             GameManager.Get.Wood -= 2;
                         }
 
                         // Farm
                         if (b == buttons[2] && GameManager.Get.People >= 1)
                         {
-                            tileGrid[upgradedTile.X, upgradedTile.Y] = new Building(TileType.Farm, buildingSpriteSheet, 10, 1);
+                            tileGrid[upgradedTile.X, upgradedTile.Y] = new Building(TileType.Farm, buildingSpriteSheet, 1);
                             GameManager.Get.People -= 1;
                         }
 
                         // Armory
                         if (b == buttons[3] && GameManager.Get.Stone >= 3)
                         {
-                            tileGrid[upgradedTile.X, upgradedTile.Y] = new Building(TileType.Armory, buildingSpriteSheet, 100, 1);
+                            tileGrid[upgradedTile.X, upgradedTile.Y] = new Building(TileType.Armory, buildingSpriteSheet, 1);
                             GameManager.Get.Stone -= 3;
                         }
 
                         // Archery
                         if (b == buttons[4] && GameManager.Get.Wood >= 3)
                         {
-                            tileGrid[upgradedTile.X, upgradedTile.Y] = new Building(TileType.ShootingRange, buildingSpriteSheet, 100, 1);
+                            tileGrid[upgradedTile.X, upgradedTile.Y] = new Building(TileType.ShootingRange, buildingSpriteSheet, 1);
                             GameManager.Get.Wood -= 3;
                         }
 
                         // Stable
                         if (b == buttons[5] && GameManager.Get.Wood >= 5)
                         {
-                            tileGrid[upgradedTile.X, upgradedTile.Y] = new Building(TileType.Stable, buildingSpriteSheet, 100, 1);
+                            tileGrid[upgradedTile.X, upgradedTile.Y] = new Building(TileType.Stable, buildingSpriteSheet, 1);
                             GameManager.Get.Wood -= 5;
                         }
 
@@ -216,7 +216,16 @@ namespace UndeadKnights.Tiles
                         // Gate
                         if (b == buttons[7] && GameManager.Get.Wood >= 2)
                         {
-                            tileGrid[upgradedTile.X, upgradedTile.Y] = new Wall(TileType.Gate, gateSpriteSheet, 1);
+                            // If the gate is placed on the path save the data so if it gets deleted it will
+                            // be a path instead of grass
+                            if (tileGrid[upgradedTile.X,upgradedTile.Y].TileType == TileType.Path)
+                            {
+                                tileGrid[upgradedTile.X, upgradedTile.Y] = new Wall(TileType.Gate, gateSpriteSheet, 1);
+                                tileGrid[upgradedTile.X, upgradedTile.Y].OnPath = true;
+                            } else
+                            {
+                                tileGrid[upgradedTile.X, upgradedTile.Y] = new Wall(TileType.Gate, gateSpriteSheet, 1);
+                            }
                             GameManager.Get.Wood -= 2;
                         }
 
@@ -252,7 +261,7 @@ namespace UndeadKnights.Tiles
                 {
                     tileGrid[i, j].Update(gt, new Point(i, j));
 
-                    // Check when tile is clicked
+                    // Check when tile is left clicked
                     if (tileGrid[i, j].IsPressed
                         && usedButtons.Count == 0
                         && !clickedOff)
@@ -286,13 +295,28 @@ namespace UndeadKnights.Tiles
                                 break;
 
                             case TileType.FarmFull:
-                                tileGrid[i, j] = new Building(TileType.Farm, buildingSpriteSheet, 10, 1);
+                                tileGrid[i, j] = new Building(TileType.Farm, buildingSpriteSheet, 1);
                                 GameManager.Get.Food += 1;
                                 break;
 
                             case TileType.Armory:
                                 UpgradeOptions(tileGrid[i, j], new List<TileType>() {
                                     TileType.ShootingRange, TileType.Stable},
+                                    new Point(i, j));
+                                break;
+
+                            case TileType.ShootingRange:
+                                UpgradeOptions(tileGrid[i, j], new List<TileType>() {},
+                                    new Point(i, j));
+                                break;
+
+                            case TileType.Stable:
+                                UpgradeOptions(tileGrid[i, j], new List<TileType>() {},
+                                    new Point(i, j));
+                                break;
+
+                            case TileType.House:
+                                UpgradeOptions(tileGrid[i, j], new List<TileType>() {},
                                     new Point(i, j));
                                 break;
 
@@ -305,6 +329,23 @@ namespace UndeadKnights.Tiles
                         }
                     }
 
+                    // If right clicked delete tile as long as its not
+                    // one of the tiles that cant be deleted
+                    if (tileGrid[i, j].IsRightClicked
+                        && tileGrid[i, j].TileType != TileType.Tree
+                        && tileGrid[i, j].TileType != TileType.Rock
+                        && tileGrid[i, j].TileType != TileType.Path
+                        && tileGrid[i, j].TileType != TileType.TownHall)
+                    {
+                        if (tileGrid[i, j].OnPath)
+                        {
+                            tileGrid[i, j] = new Tile(TileType.Path, environmentSpriteSheet);
+                        } else
+                        {
+                            tileGrid[i, j] = new Tile(TileType.Grass, environmentSpriteSheet);
+                        }
+                    }
+
                     // Grow farm
                     if (tileGrid[i, j].TileType == TileType.Farm)
                     {
@@ -313,7 +354,7 @@ namespace UndeadKnights.Tiles
                         if (newbuilding.Timer > 30000)
                         {
                             tileGrid[i, j] = new Building
-                                (TileType.FarmFull, buildingSpriteSheet, 10, newbuilding.Level);
+                                (TileType.FarmFull, buildingSpriteSheet, newbuilding.Level);
                         }
                     }
                 }
@@ -362,11 +403,12 @@ namespace UndeadKnights.Tiles
                 }
             }
 
-            // (right now its path because i dont have a town hall
+            // Set middle to town hall
+            tileGrid[25, 25] = new Building(TileType.TownHall, buildingSpriteSheet, 1);
+
             GeneratePath();
 
-            // Set middle to town hall
-            tileGrid[25, 25] = new Building(TileType.TownHall, buildingSpriteSheet, 200, 1);
+            
         }
 
         /// <summary>
@@ -378,7 +420,7 @@ namespace UndeadKnights.Tiles
             FillPath(new Point(25, 25), new Point(rng.Next(0, 51), 50));
             FillPath(new Point(25, 25), new Point(50, rng.Next(0, 51)));
 
-            FillGrass(20);
+            FillGrass(0);
         }
 
         /// <summary>
@@ -636,7 +678,8 @@ namespace UndeadKnights.Tiles
             }
 
             // Moves the UI to the middle of screen
-            usedButtons[0].PositionRectangle = new Rectangle(960 - tileTypes.Count * 75 - 25, 440, 150 * tileTypes.Count + 50, 200);
+            usedButtons[0].PositionRectangle = new Rectangle(960 - (usedButtons.Count-1) * 75 - 25, 440
+                , 150 * (usedButtons.Count-1) + 50, 200);
 
             for (int i = 1; i < usedButtons.Count; i++)
             {

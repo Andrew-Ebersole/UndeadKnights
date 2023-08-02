@@ -22,16 +22,17 @@ namespace UndeadKnights.Tiles
         // --- Fields --- //
 
         protected Texture2D texture;
-        protected Microsoft.Xna.Framework.Point spriteLocation;
+        protected Point spriteLocation;
         protected TileType tileType;
         protected MouseState currentMS;
         protected MouseState previousMS;
         protected bool isPressed;
         protected bool isHovered;
+        protected bool isRightClicked;
         protected int tileSize;
         protected Rectangle tilePos;
         protected double hoverTimer;
-
+        protected bool onPath;
         // --- Properties --- //
 
         public TileType TileType { get { return tileType; } }
@@ -46,8 +47,18 @@ namespace UndeadKnights.Tiles
         /// </summary>
         public bool IsHovered { get { return isHovered; } }
 
-        // --- Constructor --- //
+        /// <summary>
+        /// returns true the first frame the tile is right clicked
+        /// </summary>
+        public bool IsRightClicked { get { return isRightClicked; } }
 
+        /// <summary>
+        /// stores if the tile was placed on a path or not
+        /// </summary>
+        public bool OnPath { get { return onPath; } set { onPath = value; } }
+
+        // --- Constructor --- //
+        
         public Tile(TileType tileType, Texture2D texture)
         {
             this.texture = texture;
@@ -116,11 +127,24 @@ namespace UndeadKnights.Tiles
                 {
                     isPressed = false;
                 }
+
+                // Check for right click
+                if (currentMS.RightButton == ButtonState.Pressed
+                && previousMS.RightButton == ButtonState.Released)
+                {
+                    // isPressed = true when the button is right clicked
+                    isRightClicked = true;
+                }
+                else
+                {
+                    isRightClicked = false;
+                }
             }
             else
             {
                 isHovered = false;
                 isPressed = false;
+                isRightClicked = false;
                 hoverTimer = 0;
             }
 
@@ -156,13 +180,6 @@ namespace UndeadKnights.Tiles
                 tilePos,
                 new Rectangle(spriteLocation.X * 512, spriteLocation.Y * 512, 512, 512),
                 Color.White);
-            }
-            if (isPressed)
-            {
-                sb.Draw(texture,
-                tilePos,
-                new Rectangle(spriteLocation.X * 512, spriteLocation.Y * 512, 512, 512),
-                Color.Black * 0.2f);
             }
         }
     }

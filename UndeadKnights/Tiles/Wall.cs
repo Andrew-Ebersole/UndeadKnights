@@ -48,7 +48,7 @@ namespace UndeadKnights.Tiles
                     break;
 
                 case TileType.Gate:
-                    health = 100;
+                    health = 50;
                     break;
 
                 case TileType.Turret:
