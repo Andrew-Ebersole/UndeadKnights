@@ -370,6 +370,47 @@ namespace UndeadKnights.Tiles
                         && tileGrid[i, j].TileType != TileType.Path
                         && tileGrid[i, j].TileType != TileType.TownHall)
                     {
+                        // Refund materials
+                        switch (tileGrid[i, j].TileType)
+                        {
+                            case TileType.Wall:
+                                GameManager.Get.Wood += 1;
+                                break;
+
+                            case TileType.Gate:
+                                GameManager.Get.Wood += 2;
+                                break;
+
+                            case TileType.Turret:
+                                GameManager.Get.Wood += 1;
+                                GameManager.Get.Food += 1;
+                                break;
+
+                            case TileType.House:
+                                GameManager.Get.Wood += 2;
+                                HumanManager.Get.RemoveHouse(new Point(i, j));
+                                break;
+
+                            case TileType.Armory:
+                                GameManager.Get.Stone += 3;
+                                break;
+
+                            case TileType.ShootingRange:
+                                GameManager.Get.Stone += 3;
+                                GameManager.Get.Wood += 3;
+                                break;
+
+                            case TileType.Stable:
+                                GameManager.Get.Stone += 3;
+                                GameManager.Get.Wood += 5;
+                                break;
+
+                            case TileType.Farm:
+                                GameManager.Get.Food += 1;
+                                break;
+                        }
+
+                        // Return tile to default tile
                         if (tileGrid[i, j].OnPath)
                         {
                             tileGrid[i, j] = new Tile(TileType.Path, environmentSpriteSheet);

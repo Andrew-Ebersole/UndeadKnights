@@ -223,5 +223,28 @@ namespace UndeadKnights.Humans
                 }
             }
         }
+
+        public void RemoveHouse(Point home)
+        {
+            List<Human> humansToRemove = new List<Human>();
+
+            // Find which humans home is at given point
+            foreach (Human human in Humans)
+            {
+                if (human.Home == home)
+                {
+                    humansToRemove.Add(human);
+                }
+            }
+
+            // Remove the human at the given point
+            while (humansToRemove.Count > 0)
+            {
+                Humans.Remove(humansToRemove[0]);
+                humansToRemove.RemoveAt(0);
+                GameManager.Get.Food++;
+            }
+
+        }
     }
 }
