@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 // ---------------------------------------------------------------- //
 // Collaborators | Andrew Ebersole
 // Created Date  | 7-26-23
-// Last Update   | 7-26-23
+// Last Update   | 8-7-23
 // Purpose       | Variant of Human with a sword
 // ---------------------------------------------------------------- //
 namespace UndeadKnights.Humans
@@ -30,7 +30,8 @@ namespace UndeadKnights.Humans
 
         // --- Constructor --- //
 
-
+        public Knight(Texture2D texture, Point home) : base(texture, home)
+        { }
 
 
 

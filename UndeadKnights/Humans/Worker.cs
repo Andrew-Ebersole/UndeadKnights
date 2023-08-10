@@ -5,33 +5,47 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UndeadKnights.Tiles;
+using System.IO;
+using System.Threading;
 
 // ---------------------------------------------------------------- //
 // Collaborators | Andrew Ebersole
 // Created Date  | 7-26-23
-// Last Update   | 7-26-23
+// Last Update   | 8-9-23
 // Purpose       | Variant of the Human that gathers resources
 // ---------------------------------------------------------------- //
 
 namespace UndeadKnights.Humans
 {
+    enum WorkerState
+    {
+        MoveToResource,
+        Mine,
+        ReturnHome,
+        Home
+    }
     internal class Worker : Human
     {
         // --- Fields --- //
 
 
-
+        private int mineTimer;
+        private Point tileToDestroy;
+        WorkerState currentState;
 
 
         // --- Properties --- //
 
-
-
+        public WorkerState State { get { return currentState; } }
 
 
         // --- Constructor --- //
 
-
+        public Worker(Texture2D texture, Point home) : base(texture, home)
+        {
+            currentState = WorkerState.Home;
+        }
 
 
 
@@ -41,18 +55,138 @@ namespace UndeadKnights.Humans
         /// Called every frame to update functions
         /// </summary>
         /// <param name="gt"></param>
-        public void Update(GameTime gt)
+        public override void Update(GameTime gt)
         {
+            base.Update(gt);
 
+            switch (currentState)
+            {
+                case WorkerState.MoveToResource:
+                    if (!Hitbox.Intersects(new Rectangle(
+                            (int)(tileToDestroy.X * GameManager.Get.TileSize + GameManager.Get.TileSize * 0.25f),
+                            (int)(tileToDestroy.Y * GameManager.Get.TileSize + GameManager.Get.TileSize * 0.25f),
+                            (int)(GameManager.Get.TileSize * 0.5f),
+                            (int)(GameManager.Get.TileSize * 0.5f))))
+                    {
+                        if (path.Count > 0)
+                        {
+                            // Check if the worker is touching the next path
+                            if (Hitbox.Intersects(new Rectangle(
+                                (int)(path[0].Pos.X * GameManager.Get.TileSize + GameManager.Get.TileSize * 0.2f),
+                                (int)(path[0].Pos.Y * GameManager.Get.TileSize + GameManager.Get.TileSize * 0.2f),
+                                (int)(GameManager.Get.TileSize * 0.6f),
+                                (int)(GameManager.Get.TileSize * 0.6f))))
+                            {
+                                path.RemoveAt(0);
+                            }
+                            else
+                            {
+                                position -= GetDirectionVector(position, new Vector2(path[0].Pos.X, path[0].Pos.Y));
+                            }
+                        } else
+                        {
+                            position -= GetDirectionVector(position, new Vector2(tileToDestroy.X, tileToDestroy.Y)); 
+                        }
+                    } else
+                    {
+                        currentState = WorkerState.Mine;
+                        mineTimer = 0;
+                    }
+                    break;
+
+
+
+                case WorkerState.Mine:
+                    // Update mine timer
+                    mineTimer += gt.ElapsedGameTime.Milliseconds;
+
+                    // After 5 seconds break the resource
+                    if (mineTimer > 5000)
+                    {
+
+                        // Destroy resource
+                        TileManager.Get.TileToGrass(tileToDestroy);
+
+                        Pathfind(home);
+                        currentState = WorkerState.ReturnHome;
+                    }
+                    break;
+
+                    case WorkerState.ReturnHome:
+                    // keep pathfinding home until touching the house
+                    if (!Hitbox.Intersects(new Rectangle(
+                            (int)(home.X * GameManager.Get.TileSize + GameManager.Get.TileSize * 0.45f),
+                            (int)(home.Y * GameManager.Get.TileSize + GameManager.Get.TileSize * 0.45f),
+                            (int)(GameManager.Get.TileSize * 0.1f),
+                            (int)(GameManager.Get.TileSize * 0.1f))))
+                    {
+                        if (path.Count > 0)
+                        {
+                            // Check if the worker is touching the next path
+                            if (Hitbox.Intersects(new Rectangle(
+                                (int)(path[0].Pos.X * GameManager.Get.TileSize + GameManager.Get.TileSize * 0.25f),
+                                (int)(path[0].Pos.Y * GameManager.Get.TileSize + GameManager.Get.TileSize * 0.25f),
+                                (int)(GameManager.Get.TileSize * 0.5f),
+                                (int)(GameManager.Get.TileSize * 0.5f))))
+                            {
+                                path.RemoveAt(0);
+                            }
+                            else
+                            {
+                                position -= GetDirectionVector(position, new Vector2(path[0].Pos.X, path[0].Pos.Y));
+                            }
+                        } else
+                        {
+                            position -= GetDirectionVector(position, new Vector2(home.X, home.Y));
+                        }
+                    }
+                    else
+                    {
+                        currentState = WorkerState.Home;
+                    }
+                    break;
+            }
         }
 
         /// <summary>
-        /// Called every frame to update graphical elements
+        /// Updates the workers objective to destory the resources at current location
         /// </summary>
-        /// <param name="sb"></param>
-        public void Draw(SpriteBatch sb)
+        /// <param name="location"></param>
+        public bool DestroyResource(Point location)
         {
+            path.Clear();
+            Pathfind(location);
 
+            if (path.Count > 0)
+            {
+                currentState = WorkerState.MoveToResource;
+                this.tileToDestroy = location;
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Returns a normalized vector pointing in the direction you are going
+        /// </summary>
+        /// <param name="position"></param>
+        /// <param name="going"></param>
+        /// <returns></returns>
+        private Vector2 GetDirectionVector(Vector2 position, Vector2 going)
+        {
+            going *= 25;
+            going += new Vector2(GameManager.Get.TileSize * 0.25f, GameManager.Get.TileSize * 0.25f);
+
+            Vector2 returnVector = Vector2.Normalize(position - going);
+
+            // Check if the vector has real numbers in it
+            if (Math.Abs(returnVector.X) >= 0)
+            {
+                return returnVector;
+            }
+
+            // If not return defualt vector
+            return new Vector2(0, 0);
         }
     }
 }

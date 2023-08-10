@@ -10,11 +10,12 @@ using Microsoft.Xna.Framework.Content;
 using System.Security.Cryptography;
 using System.IO;
 using Microsoft.Xna.Framework.Input;
+using UndeadKnights.Humans;
 
 // ---------------------------------------------------------------- //
 // Collaborators | Andrew Ebersole
 // Created Date  | 7-26-23
-// Last Update   | 8-1-23
+// Last Update   | 8-9-23
 // Purpose       | Manages all the tiles and upgrades them when needed
 // ---------------------------------------------------------------- //
 
@@ -180,10 +181,10 @@ namespace UndeadKnights.Tiles
                         }
 
                         // Farm
-                        if (b == buttons[2] && GameManager.Get.People >= 1)
+                        if (b == buttons[2] && HumanManager.Get.WorkingWorkers() + 1 < HumanManager.Get.TotalWorkers())
                         {
+                            HumanManager.Get.RemoveUnusedHuman();
                             tileGrid[upgradedTile.X, upgradedTile.Y] = new Building(TileType.Farm, buildingSpriteSheet, 1);
-                            GameManager.Get.People -= 1;
                             clickedOff = true;
                         }
 
@@ -237,10 +238,10 @@ namespace UndeadKnights.Tiles
                         }
 
                         // Turret
-                        if (b == buttons[8] && GameManager.Get.People >= 1)
+                        if (b == buttons[8] && HumanManager.Get.WorkingWorkers() + 1 < HumanManager.Get.TotalWorkers())
                         {
+                            HumanManager.Get.RemoveUnusedHuman();
                             tileGrid[upgradedTile.X, upgradedTile.Y] = new Wall(TileType.Turret, turretSpriteSheet, 1);
-                            GameManager.Get.People -= 1;
                             clickedOff = true;
                         }
 
@@ -248,13 +249,12 @@ namespace UndeadKnights.Tiles
                         if (b == buttons[9] && GameManager.Get.Food >= 1)
                         {
                             Building newBuilding = (Building)tileGrid[upgradedTile.X, upgradedTile.Y];
-                            if (newBuilding.People < newBuilding.MaxPeople)
+                            if (HumanManager.Get.PeopleAtLocation
+                                (new Point(upgradedTile.X,upgradedTile.Y)) < newBuilding.MaxPeople)
                             {
                                 GameManager.Get.Food -= 1;
-                                GameManager.Get.People += 1;
-                                newBuilding.People += 1;
+                                HumanManager.Get.AddPeople(new Point(upgradedTile.X,upgradedTile.Y));
                                 clickedOff = true;
-                                buttons[9].Text = $"People\n\n1 food\n({newBuilding.People}/{newBuilding.MaxPeople})";
                             }
                         }
 
@@ -300,18 +300,24 @@ namespace UndeadKnights.Tiles
                                 break;
 
                             case TileType.Tree:
-                                tileGrid[i, j] = new Tile(TileType.Grass, environmentSpriteSheet);
-                                GameManager.Get.Wood += 1;
+                                if (HumanManager.Get.TotalWorkers() > HumanManager.Get.WorkingWorkers())
+                                {
+                                    HumanManager.Get.DestoryResource(new Point(i, j));
+                                }
                                 break;
 
                             case TileType.Rock:
-                                tileGrid[i, j] = new Tile(TileType.Grass, environmentSpriteSheet);
-                                GameManager.Get.Stone += 1;
+                                if (HumanManager.Get.TotalWorkers() > HumanManager.Get.WorkingWorkers())
+                                {
+                                    HumanManager.Get.DestoryResource(new Point(i, j));
+                                }
                                 break;
 
                             case TileType.FarmFull:
-                                tileGrid[i, j] = new Building(TileType.Farm, buildingSpriteSheet, 1);
-                                GameManager.Get.Food += 1;
+                                if (HumanManager.Get.TotalWorkers() > HumanManager.Get.WorkingWorkers())
+                                {
+                                    HumanManager.Get.DestoryResource(new Point(i, j));
+                                }
                                 break;
 
                             case TileType.Armory:
@@ -372,18 +378,6 @@ namespace UndeadKnights.Tiles
                             tileGrid[i, j] = new Tile(TileType.Grass, environmentSpriteSheet);
                         }
                     }
-
-                    // Grow farm
-                    if (tileGrid[i, j].TileType == TileType.Farm)
-                    {
-                        // If the farm has been around for 30 seconds it will grow into farm full
-                        Building newbuilding = (Building)tileGrid[i, j];
-                        if (newbuilding.Timer > 30000)
-                        {
-                            tileGrid[i, j] = new Building
-                                (TileType.FarmFull, buildingSpriteSheet, newbuilding.Level);
-                        }
-                    }
                 }
             }
 
@@ -433,12 +427,56 @@ namespace UndeadKnights.Tiles
                 }
             }
 
-            // Set middle to town hall
-            tileGrid[25, 25] = new Building(TileType.TownHall, buildingSpriteSheet, 1);
 
+            // Create path
             GeneratePath();
 
-            
+            // Set area around th to grass
+            for (int i = 23; i < 27; i++)
+            {
+                for (int j = 13; j < 17; j++)
+                {
+                    if (tileGrid[i, j].TileType != TileType.Path)
+                    {
+                        tileGrid[i, j] = new Tile(TileType.Grass, environmentSpriteSheet);
+                    }
+                }
+            }
+
+            // Set middle to town hall
+            tileGrid[25, 15] = new Building(TileType.TownHall, buildingSpriteSheet, 1);
+
+            // Create a house and farm
+            Point currentPos = new Point(25,15);
+
+            // Place the house in a random location
+            while (currentPos.X >= 0 && currentPos.Y >= 0
+                && currentPos.Y < 51 && currentPos.Y < 51)
+            {
+                currentPos = new Point(25, 15);
+                currentPos += new Point(rng.Next(-2, 3), rng.Next(-2, 3));
+                if (tileGrid[currentPos.X,currentPos.Y].TileType == TileType.Grass)
+                {
+                    tileGrid[currentPos.X, currentPos.Y] = new Building(TileType.House, buildingSpriteSheet, 1);
+                    HumanManager.Get.AddPeople(currentPos);
+                    break;
+                }
+            }
+
+            // Place a farm
+            currentPos = new Point(25,15);
+            while (currentPos.X >= 0 && currentPos.Y >= 0
+                && currentPos.Y < 51 && currentPos.Y < 51)
+            {
+                currentPos = new Point(25, 15);
+                currentPos += new Point(rng.Next(-2, 3), rng.Next(-2, 3));
+                if (tileGrid[currentPos.X, currentPos.Y].TileType == TileType.Grass)
+                {
+                    tileGrid[currentPos.X, currentPos.Y] = new Building(TileType.FarmFull, buildingSpriteSheet, 1);
+                    break;
+                }
+            }
+
         }
 
         /// <summary>
@@ -446,9 +484,9 @@ namespace UndeadKnights.Tiles
         /// </summary>
         private void GeneratePath()
         {
-            FillPath(new Point(25, 25), new Point(0, rng.Next(0, 51)));
-            FillPath(new Point(25, 25), new Point(rng.Next(0, 51), 50));
-            FillPath(new Point(25, 25), new Point(50, rng.Next(0, 51)));
+            FillPath(new Point(25, 15), new Point(0, rng.Next(0, 51)));
+            FillPath(new Point(25, 15), new Point(rng.Next(0, 51), 50));
+            FillPath(new Point(25, 15), new Point(50, rng.Next(0, 51)));
 
             FillGrass(20);
         }
@@ -463,7 +501,7 @@ namespace UndeadKnights.Tiles
             if (tileGrid[end.X, end.Y].TileType != TileType.Path)
             {
 
-                // Start by whichever direction is farther
+                // Whichever direction is further is more likely to be picked
                 if (Math.Abs(start.X - end.X) > Math.Abs(start.Y - end.Y))
                 {
                     // Move toward X a random amount of times
@@ -775,9 +813,56 @@ namespace UndeadKnights.Tiles
         /// <param name="tile"></param>
         private void UpdatePeopleText(Tile tile)
         {
-            Building tileToUpgrade = (Building)tile;
-            buttons[9].Text = $"People\n\nFood 1\n" +
-                $"({tileToUpgrade.People}/{tileToUpgrade.MaxPeople})";
+            if (tile is Building)
+            {
+                Building tileToUpgrade = (Building)tile;
+                buttons[9].Text = $"People\n\nFood 1\n" +
+                    $"({HumanManager.Get.PeopleAtLocation(new Point(upgradedTile.X, upgradedTile.Y))}" +
+                    $"/{tileToUpgrade.MaxPeople})";
+            }
         }
+
+        /// <summary>
+        /// Resets mined resources to the original state
+        /// </summary>
+        /// <param name="tile"></param>
+        public void TileToGrass(Point tile)
+        {
+            switch (tileGrid[tile.X, tile.Y].TileType)
+            {
+                case TileType.Tree:
+                    tileGrid[tile.X, tile.Y] = new Tile(TileType.Grass, environmentSpriteSheet);
+                    GameManager.Get.Wood += 1;
+                    break;
+
+                case TileType.Rock:
+                    tileGrid[tile.X, tile.Y] = new Tile(TileType.Grass, environmentSpriteSheet);
+                    GameManager.Get.Stone += 1;
+                    break;
+
+                case TileType.FarmFull:
+                    tileGrid[tile.X, tile.Y] = new Building(TileType.Farm, buildingSpriteSheet, 1);
+                    GameManager.Get.Food += 1;
+                    break;
+            }
+        }
+
+        public void GrowFarms()
+        {
+            for (int i = 0; i < 51; i++)
+            {
+                for (int j = 0; j < 51; j++)
+                {
+                    // Grow farm
+                    if (tileGrid[i, j].TileType == TileType.Farm)
+                    {
+                        tileGrid[i, j] = new Building
+                                (TileType.FarmFull, buildingSpriteSheet, 1);
+                    }
+                }
+            }
+        }
+
+
     }
 }

@@ -10,12 +10,13 @@ using UndeadKnights.Tiles;
 using System.ComponentModel;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Input;
+using UndeadKnights.Humans;
 
 
 // ---------------------------------------------------------------- //
 // Collaborators | Andrew Ebersole
 // Created Date  | 7-26-23
-// Last Update   | 8-1-23
+// Last Update   | 8-9-23
 // Purpose       | Manages all the content in the game, updates all
 //               | The players, monsters, and tiles
 // ---------------------------------------------------------------- //
@@ -46,7 +47,6 @@ namespace UndeadKnights
         private int wood;
         private int stone;
         private int food;
-        private int people;
 
         private Texture2D singlecolor;
 
@@ -78,8 +78,18 @@ namespace UndeadKnights
         public int Wood { get { return wood; } set {  wood = value; } }
         public int Stone { get {  return stone; } set {  stone = value; } }
         public int Food { get { return food; } set {  food = value; } }
-        public int People { get { return people; } set { people = value; } }
 
+        public bool IsNight 
+        { 
+            get 
+            {
+                if (Math.Floor(playTime / 60000) % 2 == 1) 
+                { 
+                    return true; 
+                } 
+                return  false; 
+            } 
+        }
 
         // --- Constructor --- //
 
@@ -91,12 +101,7 @@ namespace UndeadKnights
             currentKS = Keyboard.GetState();
             previousKS = Keyboard.GetState();
 
-            
-            // Starting materials
-            wood = 10;
-            stone = 10;
-            food = 10;
-
+            HumanManager.Get.Initialize(content, windowsize, gd);
             TileManager.Get.Initialize(content, windowsize, gd);
 
             // Graphics
@@ -162,6 +167,7 @@ namespace UndeadKnights
                     {
                         nights++;
                         TileManager.Get.FillGrass(95);
+                        TileManager.Get.GrowFarms();
                     }
                     // Undarken screen when its day
                     fadeToNightTimer -= gt.ElapsedGameTime.Milliseconds;
@@ -173,6 +179,7 @@ namespace UndeadKnights
 
                 // update subclasses
                 TileManager.Get.Update(gt);
+                HumanManager.Get.Update(gt);
 
                 previousKS = currentKS;
             }
@@ -190,6 +197,7 @@ namespace UndeadKnights
 
                 // Draw subclasses
                 TileManager.Get.Draw(sb);
+                HumanManager.Get.Draw(sb);
 
                 // Draw nighttime overlay
                 sb.Draw(singlecolor, new Rectangle(0, 0, 1920, 1080),
@@ -197,7 +205,8 @@ namespace UndeadKnights
 
                 // Display People
                 sb.DrawString(vinque24,
-                    $"People: {people}",
+                    $"People: {HumanManager.Get.TotalWorkers() - HumanManager.Get.WorkingWorkers()} " +
+                    $"/ {HumanManager.Get.WorkingWorkers()}",
                     new Vector2(10, 10),
                     Color.White);
 
@@ -243,11 +252,15 @@ namespace UndeadKnights
 
         public void NewGame()
         {
+            HumanManager.Get.NewGame();
             TileManager.Get.NewMap();
             tileSize = 50;
-            camera = new Point(155, 370);
+            camera = new Point(155, 170);
             playTime = 0;
             fadeToNightTimer = 0;
+            wood = 10;
+            food = 5;
+            stone = 5;
         }
     }
 }
