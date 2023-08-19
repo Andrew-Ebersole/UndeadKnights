@@ -83,16 +83,16 @@ namespace UndeadKnights.Tiles
             bool right = false;
 
             // Check if the surrounding walls are also walls
-            if (tilegrid[location.X, location.Y - 1] != null
+            if (location.Y > 0 && tilegrid[location.X, location.Y - 1] != null
                 && IsWallType(tilegrid[location.X,location.Y - 1]))
             { top = true; }
-            if (tilegrid[location.X, location.Y + 1] != null
+            if (location.Y < 50 && tilegrid[location.X, location.Y + 1] != null
                 && IsWallType(tilegrid[location.X, location.Y + 1]))
             { bottom = true; }
-            if (tilegrid[location.X - 1, location.Y] != null
+            if (location.X > 0 && tilegrid[location.X - 1, location.Y] != null
                 && IsWallType(tilegrid[location.X - 1, location.Y]))
             { left = true; }
-            if (tilegrid[location.X + 1, location.Y] != null
+            if (location.X < 50 && tilegrid[location.X + 1, location.Y] != null
                 && IsWallType(tilegrid[location.X + 1, location.Y]))
             { right = true; }
 

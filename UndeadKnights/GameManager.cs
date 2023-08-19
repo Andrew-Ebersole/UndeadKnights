@@ -83,6 +83,8 @@ namespace UndeadKnights
         public int Stone { get {  return stone; } set {  stone = value; } }
         public int Food { get { return food; } set {  food = value; } }
 
+        public Texture2D SingleColor { get { return singlecolor; } }
+
         public bool Tutorial { get { return tutorial; } set { tutorial = value; } }
 
         public bool IsNight 

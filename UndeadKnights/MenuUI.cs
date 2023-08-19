@@ -166,7 +166,7 @@ namespace UndeadKnights
                     if (buttons[1][3].IsPressed
                         && lastState == GameState.Game)
                     {
-                        gameFSM = GameState.GameOver;
+                        gameFSM = GameState.Menu;
                     }
                     break;
 

@@ -150,6 +150,12 @@ namespace UndeadKnights.Tiles
             {
                 clickedOff = true;
             }
+            // Update buttons position
+            if (usedButtons.Count > 0)
+            {
+                UpdateUIButtonPosition();
+            }
+
             foreach (Button b in usedButtons)
             {
                 b.Update(gt);
@@ -437,6 +443,15 @@ namespace UndeadKnights.Tiles
                 for (int j = 0; j < 51; j++)
                 {
                     tileGrid[i, j].Draw(sb, new Point(i, j));
+                    if (i == upgradedTile.X && j == upgradedTile.Y
+                        && usedButtons.Count > 0)
+                    {
+                        sb.Draw(GameManager.Get.SingleColor,
+                            new Rectangle(i * GameManager.Get.TileSize - GameManager.Get.Camera.X * GameManager.Get.TileSize / 25,
+                            j * GameManager.Get.TileSize - GameManager.Get.Camera.Y * GameManager.Get.TileSize / 25,
+                            GameManager.Get.TileSize, GameManager.Get.TileSize),
+                            Color.White * 0.5f);
+                    }
                 }
             }
 
@@ -784,10 +799,49 @@ namespace UndeadKnights.Tiles
                 usedButtons.Add(buttons[9]);
             }
 
-            // Moves the UI to the middle of screen
-            usedButtons[0].PositionRectangle = new Rectangle(960 - (usedButtons.Count-1) * 75 - 25, 440
-                , 150 * (usedButtons.Count-1) + 50, 200);
 
+            // Moves the UI to under 
+            UpdateUIButtonPosition();
+
+        }
+
+        /// <summary>
+        /// Moves the UI buttons to under the upgrade tile
+        /// If it is offscreen or overlapping the upgrade tile
+        /// it will move somewhere else on screen
+        /// </summary>
+        private void UpdateUIButtonPosition()
+        {
+            // Important numbers
+            int tileSize = GameManager.Get.TileSize;
+            Point camera = GameManager.Get.Camera;
+
+            // Create the background area
+            Rectangle backgroundArea = new Rectangle(tileSize + ((upgradedTile.X * tileSize) - camera.X * tileSize / 25) - (usedButtons.Count - 1) * 75 - 25,
+                tileSize + (upgradedTile.Y * tileSize) - camera.Y * tileSize / 25,
+                150 * (usedButtons.Count - 1) + 50, 200);
+
+            System.Diagnostics.Debug.WriteLine($"{camera}  :  {backgroundArea}");
+            // Check for offscreen
+            if (backgroundArea.X < 0)
+            {
+                backgroundArea.X = 0;
+            }
+            if (backgroundArea.Y < 0)
+            {
+                backgroundArea.Y = 0;
+            }
+            if (backgroundArea.X + backgroundArea.Width > 1920)
+            {
+                backgroundArea.X = 1920 - backgroundArea.Width;
+            }
+            if (backgroundArea.Y + backgroundArea.Height > 1080)
+            {
+                backgroundArea.Y = 1080 - backgroundArea.Height;
+            }
+
+            // Create the buttons
+            usedButtons[0].PositionRectangle = backgroundArea;
             for (int i = 1; i < usedButtons.Count; i++)
             {
                 usedButtons[i].PositionRectangle =
@@ -795,7 +849,6 @@ namespace UndeadKnights.Tiles
                     usedButtons[0].PositionRectangle.Y + 25, 150, 150);
             }
         }
-
         private void GenerateButtons(GraphicsDevice gd)
         {
             buttons = new List<Button>();
