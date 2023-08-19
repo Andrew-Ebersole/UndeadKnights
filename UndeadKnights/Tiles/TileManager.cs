@@ -404,10 +404,6 @@ namespace UndeadKnights.Tiles
                                 GameManager.Get.Stone += 3;
                                 GameManager.Get.Wood += 5;
                                 break;
-
-                            case TileType.Farm:
-                                GameManager.Get.Food += 1;
-                                break;
                         }
 
                         // Return tile to default tile
@@ -429,7 +425,7 @@ namespace UndeadKnights.Tiles
             previousMS = currentMS;
 
         }
-
+        
         /// <summary>
         /// Called every frame to update graphical elements
         /// </summary>
@@ -619,7 +615,7 @@ namespace UndeadKnights.Tiles
                         if (rng.Next(0, 100) > GrassPercentLeft)
                         {
                             // Determine if its will be a rock or tree
-                            if (rng.Next(0, 100) > 20)
+                            if (rng.Next(0, 100) > 25)
                             {
                                 // If the tree is near a path dont spawn (with randomization)
                                 if (rng.Next(1, 3) < NearestPath(x, y))
@@ -630,7 +626,7 @@ namespace UndeadKnights.Tiles
                             else
                             {
                                 // If the rock is near a path dont spawn (with randomization)
-                                if (rng.Next(3, 8) < NearestPath(x, y))
+                                if (rng.Next(3, 6) < NearestPath(x, y))
                                 {
                                     tileGrid[x, y] = new Tile(TileType.Rock, environmentSpriteSheet);
                                 }

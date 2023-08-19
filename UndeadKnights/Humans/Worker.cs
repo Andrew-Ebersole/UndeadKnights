@@ -12,7 +12,7 @@ using System.Threading;
 // ---------------------------------------------------------------- //
 // Collaborators | Andrew Ebersole
 // Created Date  | 7-26-23
-// Last Update   | 8-9-23
+// Last Update   | 8-11-23
 // Purpose       | Variant of the Human that gathers resources
 // ---------------------------------------------------------------- //
 
@@ -72,20 +72,38 @@ namespace UndeadKnights.Humans
                         {
                             // Check if the worker is touching the next path
                             if (Hitbox.Intersects(new Rectangle(
-                                (int)(path[0].Pos.X * GameManager.Get.TileSize + GameManager.Get.TileSize * 0.2f),
-                                (int)(path[0].Pos.Y * GameManager.Get.TileSize + GameManager.Get.TileSize * 0.2f),
-                                (int)(GameManager.Get.TileSize * 0.6f),
-                                (int)(GameManager.Get.TileSize * 0.6f))))
+                                (int)(path[0].Pos.X * GameManager.Get.TileSize + GameManager.Get.TileSize * 0.25f),
+                                (int)(path[0].Pos.Y * GameManager.Get.TileSize + GameManager.Get.TileSize * 0.25f),
+                                (int)(GameManager.Get.TileSize * 0.5f),
+                                (int)(GameManager.Get.TileSize * 0.5f))))
                             {
                                 path.RemoveAt(0);
                             }
                             else
                             {
-                                position -= GetDirectionVector(position, new Vector2(path[0].Pos.X, path[0].Pos.Y));
+                                // Move faster when on path
+                                if (TileManager.Get.TileGrid[(int)(Math.Floor((double)(Hitbox.X / GameManager.Get.TileSize))),
+                                    (int)(Math.Floor((double)(Hitbox.Y / GameManager.Get.TileSize)))].TileType == TileType.Path)
+                                {
+                                    position -= GetDirectionVector(position, new Vector2(path[0].Pos.X, path[0].Pos.Y)) * 1.25f;
+                                }
+                                else
+                                {
+                                    position -= GetDirectionVector(position, new Vector2(path[0].Pos.X, path[0].Pos.Y));
+                                }
                             }
                         } else
                         {
-                            position -= GetDirectionVector(position, new Vector2(tileToDestroy.X, tileToDestroy.Y)); 
+                            // Move faster when on path
+                            if (TileManager.Get.TileGrid[(int)(Math.Floor((double)(Hitbox.X / GameManager.Get.TileSize))),
+                                (int)(Math.Floor((double)(Hitbox.Y / GameManager.Get.TileSize)))].TileType == TileType.Path)
+                            {
+                                position -= GetDirectionVector(position, new Vector2(tileToDestroy.X, tileToDestroy.Y)) * 1.25f;
+                            }
+                            else
+                            {
+                                position -= GetDirectionVector(position, new Vector2(tileToDestroy.X, tileToDestroy.Y));
+                            }
                         }
                     } else
                     {
@@ -133,11 +151,29 @@ namespace UndeadKnights.Humans
                             }
                             else
                             {
-                                position -= GetDirectionVector(position, new Vector2(path[0].Pos.X, path[0].Pos.Y));
+                                // Move faster when on path
+                                if (TileManager.Get.TileGrid[(int)(Math.Floor((double)(Hitbox.X / GameManager.Get.TileSize))),
+                                    (int)(Math.Floor((double)(Hitbox.Y/GameManager.Get.TileSize)))].TileType == TileType.Path)
+                                {
+                                    position -= GetDirectionVector(position, new Vector2(path[0].Pos.X, path[0].Pos.Y)) * 1.25f;
+                                }
+                                else
+                                {
+                                    position -= GetDirectionVector(position, new Vector2(path[0].Pos.X, path[0].Pos.Y));
+                                }
                             }
                         } else
                         {
-                            position -= GetDirectionVector(position, new Vector2(home.X, home.Y));
+                            // Move faster when on path
+                            if (TileManager.Get.TileGrid[(int)(Math.Floor((double)(Hitbox.X / GameManager.Get.TileSize))),
+                                (int)(Math.Floor((double)(Hitbox.Y / GameManager.Get.TileSize)))].TileType == TileType.Path)
+                            {
+                                position -= GetDirectionVector(position, new Vector2(home.X,home.Y)) * 1.25f;
+                            }
+                            else
+                            {
+                                position -= GetDirectionVector(position, new Vector2(home.X,home.Y));
+                            }
                         }
                     }
                     else
@@ -174,8 +210,8 @@ namespace UndeadKnights.Humans
         /// <returns></returns>
         private Vector2 GetDirectionVector(Vector2 position, Vector2 going)
         {
+            going += new Vector2(0.25f, 0.25f);
             going *= 25;
-            going += new Vector2(GameManager.Get.TileSize * 0.25f, GameManager.Get.TileSize * 0.25f);
 
             Vector2 returnVector = Vector2.Normalize(position - going);
 

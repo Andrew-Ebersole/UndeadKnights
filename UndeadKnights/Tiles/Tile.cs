@@ -168,20 +168,11 @@ namespace UndeadKnights.Tiles
                , tileSize * location.Y - GameManager.Get.Camera.Y * tileSize / 25
                , tileSize, tileSize);
 
-            // Highlight hovered tile but hide if still for 2 seconds
-            if (isHovered && hoverTimer < 1000)
-            {
-                sb.Draw(texture,
-                tilePos,
-                new Rectangle(spriteLocation.X * 512, spriteLocation.Y * 512, 512, 512),
-                Color.White * 0.8f);
-            } else
-            {
-                sb.Draw(texture,
+            // Draw tile
+            sb.Draw(texture,
                 tilePos,
                 new Rectangle(spriteLocation.X * 512, spriteLocation.Y * 512, 512, 512),
                 Color.White);
-            }
         }
     }
 }

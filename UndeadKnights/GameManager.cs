@@ -16,7 +16,7 @@ using UndeadKnights.Humans;
 // ---------------------------------------------------------------- //
 // Collaborators | Andrew Ebersole
 // Created Date  | 7-26-23
-// Last Update   | 8-9-23
+// Last Update   | 8-19-23
 // Purpose       | Manages all the content in the game, updates all
 //               | The players, monsters, and tiles
 // ---------------------------------------------------------------- //
@@ -27,9 +27,10 @@ namespace UndeadKnights
     {
         // --- Fields --- //
 
-        //
+        // 
         private Point camera;
         private int tileSize;
+        private float fps;
 
         // stats
         private double playTime;
@@ -49,6 +50,9 @@ namespace UndeadKnights
         private int food;
 
         private Texture2D singlecolor;
+
+        // a boolean
+        private bool tutorial;
 
         // Singleton
         private static GameManager instance = null;
@@ -79,6 +83,8 @@ namespace UndeadKnights
         public int Stone { get {  return stone; } set {  stone = value; } }
         public int Food { get { return food; } set {  food = value; } }
 
+        public bool Tutorial { get { return tutorial; } set { tutorial = value; } }
+
         public bool IsNight 
         { 
             get 
@@ -107,6 +113,9 @@ namespace UndeadKnights
             // Graphics
             singlecolor = new Texture2D(gd, 1, 1);
             singlecolor.SetData(new Color[] { Color.White });
+
+            // If tutorial will be displayed when game started
+            tutorial = true;
         }
 
 
@@ -181,7 +190,20 @@ namespace UndeadKnights
                 TileManager.Get.Update(gt);
                 HumanManager.Get.Update(gt);
 
+                // Pause when escape pressed
+                if (SingleKeyPress(Keys.Escape))
+                {
+                    MenuUI.Get.GameFSM = GameState.Settings;
+                    MenuUI.Get.LastState = GameState.Game;
+                }
+
                 previousKS = currentKS;
+            }
+
+            // update fps
+            if (gt.ElapsedGameTime.Milliseconds > 0)
+            {
+                fps = 1000 / gt.ElapsedGameTime.Milliseconds;
             }
         }
 
@@ -192,8 +214,10 @@ namespace UndeadKnights
         public void Draw(SpriteBatch sb)
         {
             if (MenuUI.Get.GameFSM == GameState.Game
-                || MenuUI.Get.GameFSM == GameState.GameOver)
+                || MenuUI.Get.GameFSM == GameState.GameOver
+                || (MenuUI.Get.GameFSM == GameState.Settings && MenuUI.Get.LastState == GameState.Game))
             {
+                
 
                 // Draw subclasses
                 TileManager.Get.Draw(sb);
@@ -205,8 +229,8 @@ namespace UndeadKnights
 
                 // Display People
                 sb.DrawString(vinque24,
-                    $"People: {HumanManager.Get.TotalWorkers() - HumanManager.Get.WorkingWorkers()} " +
-                    $"/ {HumanManager.Get.WorkingWorkers()}",
+                    $"People: {HumanManager.Get.TotalWorkers()} " +
+                    $"({HumanManager.Get.TotalWorkers() - HumanManager.Get.WorkingWorkers()})",
                     new Vector2(10, 10),
                     Color.White);
 
@@ -214,7 +238,8 @@ namespace UndeadKnights
                 sb.DrawString(vinque24,
                     $"Wood: {wood}" +
                     $"\nStone: {stone}" +
-                    $"\nFood: {food}",
+                    $"\nFood: {food}" +
+                    $"\nFPS: {Math.Round(fps, 1)}",
                     new Vector2(10,55),
                     Color.White);
                 
@@ -229,6 +254,13 @@ namespace UndeadKnights
                     $"Nights: {nights}",
                     new Vector2(1700, 10),
                     Color.White);
+
+                // If in settings menu draw background shadow
+                if (MenuUI.Get.GameFSM == GameState.Settings
+                    || MenuUI.Get.GameFSM == GameState.GameOver)
+                {
+                    sb.Draw(singlecolor, new Rectangle(0, 0, 1920, 1080), Color.Black * 0.45f);
+                }
 
                 // Draw Camera Position
                 //sb.DrawString(vinque24,$"({Camera.X},{Camera.Y}) : {tileSize} ", new Vector2(10,10),Color.White);

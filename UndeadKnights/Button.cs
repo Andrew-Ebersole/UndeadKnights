@@ -16,7 +16,7 @@ using Microsoft.Xna.Framework.Content;
 // ---------------------------------------------------------------- //
 // Collaborators | Andrew Ebersole
 // Created Date  | 7-26-23
-// Last Update   | 7-31-23
+// Last Update   | 8-19-23
 // Purpose       | Used for basic UI elements to create clickable buttons
 // ---------------------------------------------------------------- //
 
@@ -142,7 +142,7 @@ namespace UndeadKnights
 
             if (isHovered)
             {
-                textColor = Color.Yellow;
+                textColor = Color.DarkRed;
             } else
             {
                 textColor = Color.White;

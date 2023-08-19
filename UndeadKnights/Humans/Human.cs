@@ -12,7 +12,7 @@ using System.Collections;
 // ---------------------------------------------------------------- //
 // Collaborators | Andrew Ebersole
 // Created Date  | 7-26-23
-// Last Update   | 8-9-23
+// Last Update   | 8-11-23
 // Purpose       | Base class of Humans
 // ---------------------------------------------------------------- //
 
@@ -73,7 +73,7 @@ namespace UndeadKnights.Humans
             if (!Hitbox.Intersects(new Rectangle
                 ((int)(home.X * GameManager.Get.TileSize + 0.25f * GameManager.Get.TileSize),
                 (int)(home.Y * GameManager.Get.TileSize + 0.25f * GameManager.Get.TileSize),
-                GameManager.Get.TileSize,GameManager.Get.TileSize)))
+                (int)(GameManager.Get.TileSize * 0.5f),(int)(GameManager.Get.TileSize * 0.5f))))
             {
 
                 // Get Tile Size
@@ -169,14 +169,14 @@ namespace UndeadKnights.Humans
                         float distance = 4000;
                         if (TileManager.Get.TileGrid[xPos, yPos].TileType == TileType.Path)
                         {
-                            distance = 1.75f;
+                            distance = 0.75f;
                         }
                         else if (TileManager.Get.TileGrid[xPos, yPos].TileType != TileType.Wall
                                 && TileManager.Get.TileGrid[xPos, yPos].TileType != TileType.Turret
                                 && TileManager.Get.TileGrid[xPos, yPos].TileType != TileType.Tree
                                 && TileManager.Get.TileGrid[xPos, yPos].TileType != TileType.Rock)
                         {
-                            distance = 2;
+                            distance = 1;
                         } else if (TileManager.Get.TileGrid[xPos, yPos].TileType == TileType.Tree
                                 || TileManager.Get.TileGrid[xPos, yPos].TileType == TileType.Rock)
                         {

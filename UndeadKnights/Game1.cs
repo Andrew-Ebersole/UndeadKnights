@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework.Input;
 // ---------------------------------------------------------------- //
 // Collaborators | Andrew Ebersole
 // Created Date  | 7-21-23
-// Last Update   | 7-28-23
+// Last Update   | 8-11-23
 // Purpose       | Main class of the program, used to initalize other
 //               | Classes and delegaate tasks to those classes
 // ---------------------------------------------------------------- //
@@ -65,7 +65,8 @@ namespace UndeadKnights
 
         protected override void Update(GameTime gameTime)
         {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
+            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape)
+                && MenuUI.Get.GameFSM == GameState.Menu)
                 Exit();
 
             // Update Menu UI
@@ -84,7 +85,7 @@ namespace UndeadKnights
         protected override void Draw(GameTime gameTime)
         {
             //Background color
-            GraphicsDevice.Clear(Color.White);
+            GraphicsDevice.Clear(new Color(45,45,50));
             _spriteBatch.Begin();
 
             // Draw Menu UI
