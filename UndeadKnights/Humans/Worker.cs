@@ -201,28 +201,5 @@ namespace UndeadKnights.Humans
             }
             return false;
         }
-
-        /// <summary>
-        /// Returns a normalized vector pointing in the direction you are going
-        /// </summary>
-        /// <param name="position"></param>
-        /// <param name="going"></param>
-        /// <returns></returns>
-        private Vector2 GetDirectionVector(Vector2 position, Vector2 going)
-        {
-            going += new Vector2(0.25f, 0.25f);
-            going *= 25;
-
-            Vector2 returnVector = Vector2.Normalize(position - going);
-
-            // Check if the vector has real numbers in it
-            if (Math.Abs(returnVector.X) >= 0)
-            {
-                return returnVector;
-            }
-
-            // If not return defualt vector
-            return new Vector2(0, 0);
-        }
     }
 }

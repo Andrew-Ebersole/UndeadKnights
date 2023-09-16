@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 // ---------------------------------------------------------------- //
 // Collaborators | Andrew Ebersole
 // Created Date  | 7-29-23
-// Last Update   | 7-30-23
+// Last Update   | 8-15-23
 // Purpose       | Tiles that have health and can be destroyed
 // ---------------------------------------------------------------- //
 
@@ -19,6 +19,7 @@ namespace UndeadKnights.Tiles
     {
         // --- Fields --- //
 
+        private int maxHealth;
         private int health;
         private int level;
         private int people;
@@ -52,49 +53,88 @@ namespace UndeadKnights.Tiles
             {
                 case TileType.Farm:
                     this.spriteLocation = new Point(1, 0);
-                    health = 10;
+                    maxHealth = 10;
                     break;
                 case TileType.FarmFull:
                     this.spriteLocation = new Point(2, 0);
-                    health = 10;
+                    maxHealth = 10;
                     break;
                 case TileType.TownHall:
                     this.spriteLocation = new Point(3, 0);
-                    health = 200;
+                    maxHealth = 200;
                     break;
                 case TileType.House:
                     this.spriteLocation = new Point(0, 1);
                     maxPeople = 2;
-                    health = 50;
+                    maxHealth = 50;
                     break;
                 case TileType.Armory:
                     this.spriteLocation = new Point(1, 1);
-                    health = 100;
+                    maxHealth = 100;
                     maxPeople = 2;
                     break;
                 case TileType.ShootingRange:
                     this.spriteLocation = new Point(2, 1);
-                    health = 50;
+                    maxHealth = 50;
                     maxPeople = 2;
                     break;
                 case TileType.Stable:
                     this.spriteLocation = new Point(3, 1);
-                    health = 50;
+                    maxHealth = 50;
                     maxPeople = 1;
                     break;
             }
+            health = maxHealth;
         }
 
 
 
         // --- Methods --- //
 
+        /// <summary>
+        /// Updates building every frame
+        /// </summary>
+        /// <param name="gt"></param>
+        /// <param name="location"></param>
         public override void Update(GameTime gt, Point location)
         {
             base.Update(gt,location);
             timer += gt.ElapsedGameTime.Milliseconds;
+
+            if (!GameManager.Get.IsNight)
+            {
+                health = maxHealth;
+            }
         }
 
+        /// <summary>
+        /// Draws the building
+        /// </summary>
+        /// <param name="sb"></param>
+        /// <param name="location"></param>
+        public override void Draw(SpriteBatch sb, Point location)
+        {
+            // draws the tile
+            base.Draw(sb, location);
+
+            // draw text displaying health (for debug)
+            int tileSize = GameManager.Get.TileSize;
+            Point camera = GameManager.Get.Camera;
+            sb.DrawString(GameManager.Get.Vinque24,
+                $"{health}",
+                new Vector2(location.X * tileSize - camera.X * tileSize / 25,
+                location.Y * tileSize - camera.Y * tileSize / 25),
+                Color.White);
+        }
+
+        /// <summary>
+        /// Removes inputted amount of damage from the buildings health
+        /// </summary>
+        /// <param name="damage"></param>
+        public void TakeDamage(int damage)
+        {
+            health -= damage;
+        }
 
 
 

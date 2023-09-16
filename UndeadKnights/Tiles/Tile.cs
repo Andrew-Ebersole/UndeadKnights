@@ -11,7 +11,7 @@ using System.Runtime.CompilerServices;
 // ---------------------------------------------------------------- //
 // Collaborators | Andrew Ebersole
 // Created Date  | 7-26-23
-// Last Update   | 7-31-23
+// Last Update   | 8-15-23
 // Purpose       | Makes up a multitude of different tiles
 // ---------------------------------------------------------------- //
 
@@ -158,7 +158,7 @@ namespace UndeadKnights.Tiles
         /// Called every frame to update graphical elements
         /// </summary>
         /// <param name="sb"></param>
-        public void Draw(SpriteBatch sb, Point location)
+        public virtual void Draw(SpriteBatch sb, Point location)
         {
             // Find the current tile size
             int tileSize = GameManager.Get.TileSize;

@@ -15,7 +15,7 @@ using UndeadKnights.Humans;
 // ---------------------------------------------------------------- //
 // Collaborators | Andrew Ebersole
 // Created Date  | 7-26-23
-// Last Update   | 8-9-23
+// Last Update   | 9-15-23
 // Purpose       | Manages all the tiles and upgrades them when needed
 // ---------------------------------------------------------------- //
 
@@ -366,6 +366,8 @@ namespace UndeadKnights.Tiles
                                 break;
 
                         }
+
+                        
                     }
 
                     // If right clicked delete tile as long as its not
@@ -419,6 +421,26 @@ namespace UndeadKnights.Tiles
                         } else
                         {
                             tileGrid[i, j] = new Tile(TileType.Grass, environmentSpriteSheet);
+                        }
+                    }
+
+                    // If tile health = 0 return to default
+
+                    if (tileGrid[i,j] is Building)
+                    {
+                        Building building = (Building)tileGrid[i, j];
+
+                        if (building.Health <= 0)
+                        {
+                            // Return tile to default tile
+                            if (building.OnPath)
+                            {
+                                tileGrid[i, j] = new Tile(TileType.Path, environmentSpriteSheet);
+                            }
+                            else
+                            {
+                                tileGrid[i, j] = new Tile(TileType.Grass, environmentSpriteSheet);
+                            }
                         }
                     }
                 }

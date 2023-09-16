@@ -87,6 +87,7 @@ namespace UndeadKnights
 
         public bool Tutorial { get { return tutorial; } set { tutorial = value; } }
 
+        public SpriteFont Vinque24 { get { return vinque24; } }
         public bool IsNight 
         { 
             get 
