@@ -16,7 +16,7 @@ using UndeadKnights.Humans;
 // ---------------------------------------------------------------- //
 // Collaborators | Andrew Ebersole
 // Created Date  | 7-26-23
-// Last Update   | 8-19-23
+// Last Update   | 1-3-24
 // Purpose       | Manages all the content in the game, updates all
 //               | The players, monsters, and tiles
 // ---------------------------------------------------------------- //
@@ -51,9 +51,6 @@ namespace UndeadKnights
 
         private Texture2D singlecolor;
 
-        // a boolean
-        private bool tutorial;
-
         // Singleton
         private static GameManager instance = null;
 
@@ -85,8 +82,6 @@ namespace UndeadKnights
 
         public Texture2D SingleColor { get { return singlecolor; } }
 
-        public bool Tutorial { get { return tutorial; } set { tutorial = value; } }
-
         public SpriteFont Vinque24 { get { return vinque24; } }
         public bool IsNight 
         { 
@@ -117,8 +112,8 @@ namespace UndeadKnights
             singlecolor = new Texture2D(gd, 1, 1);
             singlecolor.SetData(new Color[] { Color.White });
 
-            // If tutorial will be displayed when game started
-            tutorial = true;
+           
+            playTime = 0;
         }
 
 
@@ -218,7 +213,8 @@ namespace UndeadKnights
         {
             if (MenuUI.Get.GameFSM == GameState.Game
                 || MenuUI.Get.GameFSM == GameState.GameOver
-                || (MenuUI.Get.GameFSM == GameState.Settings && MenuUI.Get.LastState == GameState.Game))
+                || (MenuUI.Get.GameFSM == GameState.Settings && MenuUI.Get.LastState == GameState.Game)
+                || (MenuUI.Get.GameFSM == GameState.Tutorial))
             {
                 
 
