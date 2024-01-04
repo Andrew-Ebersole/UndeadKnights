@@ -15,7 +15,7 @@ using UndeadKnights.Humans;
 // ---------------------------------------------------------------- //
 // Collaborators | Andrew Ebersole
 // Created Date  | 7-26-23
-// Last Update   | 9-15-23
+// Last Update   | 1-4-24
 // Purpose       | Manages all the tiles and upgrades them when needed
 // ---------------------------------------------------------------- //
 
@@ -154,6 +154,9 @@ namespace UndeadKnights.Tiles
             if (usedButtons.Count > 0)
             {
                 UpdateUIButtonPosition();
+
+                // Trigger Building Tutorial
+                MenuUI.Get.TriggerTutorial(TutorialScreen.Building);
             }
 
             foreach (Button b in usedButtons)
@@ -200,6 +203,9 @@ namespace UndeadKnights.Tiles
                             tileGrid[upgradedTile.X, upgradedTile.Y] = new Building(TileType.Armory, buildingSpriteSheet, 1);
                             GameManager.Get.Stone -= 3;
                             clickedOff = true;
+
+                            // Trigger Tutorial for troops
+                            MenuUI.Get.TriggerTutorial(TutorialScreen.CreatingTroops);
                         }
 
                         // Archery
@@ -843,7 +849,6 @@ namespace UndeadKnights.Tiles
                 tileSize + (upgradedTile.Y * tileSize) - camera.Y * tileSize / 25,
                 150 * (usedButtons.Count - 1) + 50, 200);
 
-            System.Diagnostics.Debug.WriteLine($"{camera}  :  {backgroundArea}");
             // Check for offscreen
             if (backgroundArea.X < 0)
             {

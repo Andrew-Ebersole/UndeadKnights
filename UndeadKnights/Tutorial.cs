@@ -10,7 +10,7 @@ using Microsoft.Xna.Framework.Input;
 // ---------------------------------------------------------------- //
 // Collaborators | Andrew Ebersole
 // Created Date  | 9-15-23
-// Last Update   | 1-3-24
+// Last Update   | 1-4-24
 // Purpose       | Used to show tips on how to play at different
 //               | Stages in the game
 // ---------------------------------------------------------------- //
@@ -33,7 +33,7 @@ namespace UndeadKnights
 
         private TutorialScreen screen;
         private double timer;
-        private int screensShown;
+        private List<TutorialScreen> screensShown;
 
         // --- Properties --- //
 
@@ -54,7 +54,7 @@ namespace UndeadKnights
             } 
         }
 
-        public int ScreensShown { get { return screensShown; } }
+        public List<TutorialScreen> ScreensShown { get { return screensShown; } }
 
         // --- Constructor --- //
 
@@ -62,7 +62,7 @@ namespace UndeadKnights
         {
             screen = TutorialScreen.None;
             timer = 0;
-            screensShown = 0;
+            screensShown = new List<TutorialScreen>();
         }
 
 
@@ -114,7 +114,7 @@ namespace UndeadKnights
         public void UpdateScreen(TutorialScreen screen)
         {
             this.screen = screen;
-            screensShown++;
+            screensShown.Add(screen);
             timer = 0;
         }
 

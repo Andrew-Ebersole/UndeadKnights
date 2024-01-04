@@ -12,7 +12,7 @@ using System;
 // ---------------------------------------------------------------- //
 // Collaborators | Andrew Ebersole
 // Created Date  | 7-26-23
-// Last Update   | 1-3-24
+// Last Update   | 1-4-24
 // Purpose       | Controls the menu of the game
 // ---------------------------------------------------------------- //
 
@@ -118,10 +118,21 @@ namespace UndeadKnights
         {
             
             // Tutorial checks
-            if (GameManager.Get.PlayTime > 0 && tutorial.ScreensShown < 1)
+            if (displayTutorial)
             {
-                tutorial.UpdateScreen(TutorialScreen.Controls);
-                gameFSM = GameState.Tutorial;
+                // Controls (0 seconds)
+                if (GameManager.Get.PlayTime > 0 && !tutorial.ScreensShown.Contains(TutorialScreen.Controls))
+                {
+                    tutorial.UpdateScreen(TutorialScreen.Controls);
+                    gameFSM = GameState.Tutorial;
+                }
+
+                // Enemies (60 seconds "Night Time")
+                if (GameManager.Get.PlayTime > 60000 && !tutorial.ScreensShown.Contains(TutorialScreen.Enemies))
+                {
+                    tutorial.UpdateScreen(TutorialScreen.Enemies);
+                    gameFSM = GameState.Tutorial;
+                }
             }
 
             // Menu finite state machine
@@ -221,6 +232,8 @@ namespace UndeadKnights
                     if (tutorial.IsPressed)
                     {
                         gameFSM = GameState.Game;
+
+                        TriggerTutorial(TutorialScreen.CollectingResources);
                     }
                     break;
             }
@@ -417,5 +430,38 @@ namespace UndeadKnights
 
         }
 
+
+        public void TriggerTutorial(TutorialScreen screen)
+        {
+            switch(screen)
+            {
+                case TutorialScreen.CollectingResources:
+                    // Collecting Resources (After First Screen Goes Away)
+                    if (!tutorial.ScreensShown.Contains(TutorialScreen.CollectingResources))
+                    {
+                        tutorial.UpdateScreen(TutorialScreen.CollectingResources);
+                        gameFSM = GameState.Tutorial;
+                    }
+                    break;
+
+                case TutorialScreen.Building:
+                    // Building (After First Ground Clicked)
+                    if (!tutorial.ScreensShown.Contains(TutorialScreen.Enemies))
+                    {
+                        tutorial.UpdateScreen(TutorialScreen.Enemies);
+                        gameFSM = GameState.Tutorial;
+                    }
+                    break;
+
+                case TutorialScreen.CreatingTroops:
+                    // Creating Troops (After First Armory Built)
+                    if (!tutorial.ScreensShown.Contains(TutorialScreen.Enemies))
+                    {
+                        tutorial.UpdateScreen(TutorialScreen.Enemies);
+                        gameFSM = GameState.Tutorial;
+                    }
+                    break;
+            }
+        }
     }
 }
