@@ -6,6 +6,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework.Input;
+using System.Reflection.Metadata;
+using Microsoft.Xna.Framework.Content;
 
 // ---------------------------------------------------------------- //
 // Collaborators | Andrew Ebersole
@@ -34,6 +36,10 @@ namespace UndeadKnights
         private TutorialScreen screen;
         private double timer;
         private List<TutorialScreen> screensShown;
+        private Texture2D singleColor;
+        private SpriteFont vinque48;
+        private SpriteFont vinque72;
+        private Rectangle window;
 
         // --- Properties --- //
 
@@ -58,11 +64,14 @@ namespace UndeadKnights
 
         // --- Constructor --- //
 
-        public Tutorial()
+        public Tutorial(ContentManager content, Rectangle window)
         {
             screen = TutorialScreen.None;
             timer = 0;
             screensShown = new List<TutorialScreen>();
+            vinque48 = content.Load<SpriteFont>("vinque-48");
+            vinque72 = content.Load<SpriteFont>("vinque-72");
+            this.window = window;
         }
 
 
@@ -90,19 +99,165 @@ namespace UndeadKnights
             // Choose what tutorial to show
             switch (screen)
             {
-                case TutorialScreen.Controls:
+                case TutorialScreen.Controls: // --- Controls -----------------------------------//
+                    // Draw the title
+                    sb.DrawString(vinque72,
+                        "Controls",
+                        new Vector2(window.Width / 12, window.Height / 12),
+                        Color.White);
+
+                    // Line 1
+                    sb.DrawString(vinque48,
+                        "WASD:",
+                        new Vector2(window.Width / 12, 4 * window.Height / 12),
+                        Color.White);
+                    sb.DrawString(vinque48,
+                        "move the camera",
+                        new Vector2(6 * window.Width / 12, 4 * window.Height / 12),
+                        Color.White);
+
+                    // Line 2
+                    sb.DrawString(vinque48,
+                        "UP / DOWN Arrows:",
+                        new Vector2(window.Width / 12, 6 * window.Height / 12),
+                        Color.White);
+                    sb.DrawString(vinque48,
+                        "zoom in and out",
+                        new Vector2(6 * window.Width / 12, 6 * window.Height / 12),
+                        Color.White);
+
+                    // Line 3
+                    sb.DrawString(vinque48,
+                        "Left Click:",
+                        new Vector2(window.Width / 12, 8 * window.Height / 12),
+                        Color.White);
+                    sb.DrawString(vinque48,
+                        "build and collect resources",
+                        new Vector2(6 * window.Width / 12, 8 * window.Height / 12),
+                        Color.White);
+
                     break;
 
-                case TutorialScreen.CollectingResources:
+                case TutorialScreen.CollectingResources: // --- Resources -----------------------------------//
+                    // Draw the title
+                    sb.DrawString(vinque72,
+                        "Resources",
+                        new Vector2(window.Width / 12, window.Height / 12),
+                        Color.White);
+
+                    // Line 1
+                    sb.DrawString(vinque48,
+                        "Click trees and boulders to collect resources",
+                        new Vector2(window.Width / 12, 4 * window.Height / 12),
+                        Color.White);
+
+                    // Line 2
+                    sb.DrawString(vinque48,
+                        "Click an empty tile to build",
+                        new Vector2(window.Width / 12, 6 * window.Height / 12),
+                        Color.White);
+
+                    // Line 3
+                    sb.DrawString(vinque48,
+                        "Click on houses to create more people",
+                        new Vector2(window.Width / 12, 8 * window.Height / 12),
+                        Color.White);
+
+                    // Line 4
+                    sb.DrawString(vinque48,
+                        "Collect food from farms",
+                        new Vector2(window.Width / 12, 10 * window.Height / 12),
+                        Color.White);
                     break;
 
-                case TutorialScreen.Building:
+                case TutorialScreen.Building: // --- Building -----------------------------------//
+                    // Draw the title
+                    sb.DrawString(vinque72,
+                        "Building",
+                        new Vector2(window.Width / 12, window.Height / 12),
+                        Color.White);
+
+                    // Line 1
+                    sb.DrawString(vinque48,
+                        "Build more houses to gain more people",
+                        new Vector2(window.Width / 12, 4 * window.Height / 12),
+                        Color.White);
+
+                    // Line 2
+                    sb.DrawString(vinque48,
+                        "Build farms to grow more food",
+                        new Vector2(window.Width / 12, 6 * window.Height / 12),
+                        Color.White);
+
+                    // Line 3
+                    sb.DrawString(vinque48,
+                        "Build walls to stop enemies",
+                        new Vector2(window.Width / 12, 8 * window.Height / 12),
+                        Color.White);
+
+                    // Line 4
+                    sb.DrawString(vinque48,
+                        "Build the Armory to creating troops",
+                        new Vector2(window.Width / 12, 10 * window.Height / 12),
+                        Color.White);
                     break;
 
-                case TutorialScreen.CreatingTroops:
+                case TutorialScreen.CreatingTroops: // --- Troops -----------------------------------//
+                    // Draw the title
+                    sb.DrawString(vinque72,
+                        "Troops",
+                        new Vector2(window.Width / 12, window.Height / 12),
+                        Color.White);
+                    // Line 1
+                    sb.DrawString(vinque48,
+                        "Train troops to defeat enemies",
+                        new Vector2(window.Width / 12, 4 * window.Height / 12),
+                        Color.White);
+
+                    // Line 2
+                    sb.DrawString(vinque48,
+                        "Upgrade the armory to train specialized troops",
+                        new Vector2(window.Width / 12, 6 * window.Height / 12),
+                        Color.White);
+
+                    // Line 3
+                    sb.DrawString(vinque48,
+                        "Archers can attack from behind walls",
+                        new Vector2(window.Width / 12, 8 * window.Height / 12),
+                        Color.White);
+
+                    // Line 4
+                    sb.DrawString(vinque48,
+                        "Knights move quickly and have more health",
+                        new Vector2(window.Width / 12, 10 * window.Height / 12),
+                        Color.White);
                     break;
 
-                case TutorialScreen.Enemies:
+                case TutorialScreen.Enemies: // --- Enemies -----------------------------------//
+                    // Draw the title
+                    sb.DrawString(vinque72,
+                        "Enemies",
+                        new Vector2(window.Width / 12, window.Height / 12),
+                        Color.White);
+
+                    // Line 1
+                    sb.DrawString(vinque48,
+                        "Enemies attack at night",
+                        new Vector2(window.Width / 12, 4 * window.Height / 12),
+                        Color.White);
+
+                    // Line 2
+                    sb.DrawString(vinque48,
+                        "Workers stop working at night",
+                        new Vector2(window.Width / 12, 6 * window.Height / 12),
+                        Color.White);
+
+                    // Line 3
+                    sb.DrawString(vinque48,
+                        "Use troops and build defenses to defeat the enemies",
+                        new Vector2(window.Width / 12, 8 * window.Height / 12),
+                        Color.White);
+
                     break;
             }
         }
@@ -120,10 +275,8 @@ namespace UndeadKnights
 
         private void DrawScreen(SpriteBatch sb)
         {
-            Texture2D singleColor = GameManager.Get.SingleColor;
-            SpriteFont font = GameManager.Get.Vinque24;
-            Rectangle window = new Rectangle(0, 0, 1920, 1080);
-            sb.Draw(singleColor, window, Color.Black * 0.4f);
+            singleColor = GameManager.Get.SingleColor;
+            sb.Draw(singleColor, window, Color.Black * 0.7f);
         }
     }
 }

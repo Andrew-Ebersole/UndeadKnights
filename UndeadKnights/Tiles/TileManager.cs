@@ -881,8 +881,7 @@ namespace UndeadKnights.Tiles
             buttons = new List<Button>();
 
             // Background
-            buttons.Add(new Button(new Rectangle(-1000, -1000, 400, 200)
-                , "", gd, vinque24));
+            buttons.Add(new Button(new Rectangle(-1000, -1000, 400, 200), "", gd, vinque24));
 
             // Place house
             buttons.Add(new Button(new Rectangle(-1000, -1000, 150, 150),

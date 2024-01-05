@@ -120,11 +120,11 @@ namespace UndeadKnights.Tiles
             // draw text displaying health (for debug)
             int tileSize = GameManager.Get.TileSize;
             Point camera = GameManager.Get.Camera;
-            sb.DrawString(GameManager.Get.Vinque24,
-                $"{health}",
-                new Vector2(location.X * tileSize - camera.X * tileSize / 25,
-                location.Y * tileSize - camera.Y * tileSize / 25),
-                Color.White);
+            //sb.DrawString(GameManager.Get.Vinque24,
+            //    $"{health}",
+            //    new Vector2(location.X * tileSize - camera.X * tileSize / 25,
+            //    location.Y * tileSize - camera.Y * tileSize / 25),
+            //    Color.White);
         }
 
         /// <summary>

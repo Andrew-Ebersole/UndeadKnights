@@ -102,7 +102,7 @@ namespace UndeadKnights
             // Enter locations of all buttons
             CreateButtons(gd);
 
-            tutorial = new Tutorial();
+            tutorial = new Tutorial(content, window);
             displayTutorial = true;
         }
 
@@ -446,18 +446,18 @@ namespace UndeadKnights
 
                 case TutorialScreen.Building:
                     // Building (After First Ground Clicked)
-                    if (!tutorial.ScreensShown.Contains(TutorialScreen.Enemies))
+                    if (!tutorial.ScreensShown.Contains(TutorialScreen.Building))
                     {
-                        tutorial.UpdateScreen(TutorialScreen.Enemies);
+                        tutorial.UpdateScreen(TutorialScreen.Building);
                         gameFSM = GameState.Tutorial;
                     }
                     break;
 
                 case TutorialScreen.CreatingTroops:
                     // Creating Troops (After First Armory Built)
-                    if (!tutorial.ScreensShown.Contains(TutorialScreen.Enemies))
+                    if (!tutorial.ScreensShown.Contains(TutorialScreen.CreatingTroops))
                     {
-                        tutorial.UpdateScreen(TutorialScreen.Enemies);
+                        tutorial.UpdateScreen(TutorialScreen.CreatingTroops);
                         gameFSM = GameState.Tutorial;
                     }
                     break;
